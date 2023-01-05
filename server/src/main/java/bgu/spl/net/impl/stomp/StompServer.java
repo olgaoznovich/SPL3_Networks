@@ -1,6 +1,6 @@
 package bgu.spl.net.impl.stomp;
 
-import bgu.spl.net.impl.echo.EchoProtocol;
+import bgu.spl.net.impl.stomp.StompProtocol;
 import bgu.spl.net.impl.echo.LineMessageEncoderDecoder;
 import bgu.spl.net.srv.Server;
 import bgu.spl.net.srv.ServerFactory;
@@ -12,7 +12,7 @@ public class StompServer {
         int numberOfThreads = 3;
         ServerFactory<String> stringServerFactory = new ServerFactory<>(numberOfThreads,
                 port,
-                EchoProtocol::new,
+                StompProtocol::new,
                 LineMessageEncoderDecoder::new,
                 true);
         Server<String> server = stringServerFactory.getServer();
