@@ -5,7 +5,8 @@ import bgu.spl.net.srv.ConnectionHandler;
 import bgu.spl.net.srv.Connections;
 
 public class StompProtocol implements StompMessagingProtocol<String> {
-    
+    private final int USERNAME_BEGIN_INDEX = 6;
+    private final int PASSWORD_BEGIN_INDEX = 9;
     private boolean shouldTerminate = false;
     private int connectionId;
     private Connections<String> connections;
@@ -31,12 +32,36 @@ public class StompProtocol implements StompMessagingProtocol<String> {
     }
     
     private String proccessConnect(String[] msgComps) {
-        // recognize login header
-        // Arrays.search
 
+        // recognize username header
+        String username = null;
+        for (String s: msgComps){
+            if (s.contains("login")){
+                username = s.substring(USERNAME_BEGIN_INDEX);
+                break;
+            }
+        }
         // recognize password header
+        String password = null;
+        for (String s: msgComps){
+            if (s.contains("password")){
+                password = s.substring(PASSWORD_BEGIN_INDEX);
+                break;
+            }
+        }
+        if (username == null){
 
+        }
+        else if (password == null){
 
+        }
+        else {
+            boolean succeed = connections.login(username, password, connectionId, handler);
+            if (!succeed){
+
+            }
+        }
+        // next thing add error messages and build answer...
         return "";
     }
 

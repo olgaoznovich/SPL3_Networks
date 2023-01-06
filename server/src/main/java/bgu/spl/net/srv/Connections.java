@@ -9,4 +9,6 @@ public interface Connections<T> {
     void send(String channel, T msg);
 
     void disconnect(int connectionId);
+
+    boolean login(String username, String password, int connectionId, ConnectionHandler<T> handler );
 }
