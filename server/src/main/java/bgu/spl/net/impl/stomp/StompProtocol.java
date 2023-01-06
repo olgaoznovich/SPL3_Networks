@@ -12,13 +12,25 @@ public class StompProtocol implements StompMessagingProtocol<String> {
     
     public String process(String message) {
         String[] msgComponents = message.split(System.lineSeparator());
-        switch(msgComponents[0]) {
-            case ("CONNECT"): {break;}
-            case ("SEND"): {break;}
-            case ("SUBSCRIBE"): {break;}
-            case ("UNSUBSCRIBE"): {break;}
-            case ("DISCONNECT"): {break;}
-            default: 
+        switch (msgComponents[0]) {
+            case ("CONNECT") -> {
+                System.out.println("CONNECT");
+            }
+            case ("DISCONNECT") -> {
+                System.out.println("DISCONNECT");
+            }
+            case ("SEND") -> {
+                System.out.println("SEND");
+            }
+            case ("SUBSCRIBE") -> {
+                System.out.println("SUBSCRIBE");
+            }
+            case ("UNSUBSCRIBE") -> {
+                System.out.println("UNSUBSCRIBE");
+            }
+            default -> {
+                System.out.println("ERROR");
+            }
         }
         return null;
     }
