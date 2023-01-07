@@ -21,7 +21,7 @@ public class StompProtocol implements StompMessagingProtocol<String> {
         String[] msgComponents = message.split(System.lineSeparator());
         String result = "";
         switch(msgComponents[0]) {
-            case ("CONNECT"): {result = proccessConnect(msgComponents); break;}
+            case ("CONNECT"): {result = proccessConnect(msgComponents, message); break;}
             case ("SEND"): {result = proccessSend(msgComponents); break;}
             case ("SUBSCRIBE"): {result = proccessSubscribe(msgComponents); break;}
             case ("UNSUBSCRIBE"): {result = proccessUnsubscribe(msgComponents);  break;}
@@ -31,38 +31,66 @@ public class StompProtocol implements StompMessagingProtocol<String> {
         return result;
     }
     
-    private String proccessConnect(String[] msgComps) {
-
+    private String proccessConnect(String[] msgComps, String message) {
+        String errorMsg = "";
         // recognize username header
-        String username = null;
-        for (String s: msgComps){
-            if (s.contains("login")){
-                username = s.substring(USERNAME_BEGIN_INDEX);
-                break;
-            }
-        }
+        String username = searchAndCut(msgComps, USERNAME_BEGIN_INDEX, "login");
+        
         // recognize password header
-        String password = null;
-        for (String s: msgComps){
-            if (s.contains("password")){
-                password = s.substring(PASSWORD_BEGIN_INDEX);
-                break;
-            }
-        }
+        String password = searchAndCut(msgComps, PASSWORD_BEGIN_INDEX, "password");
+        
         if (username == null){
-
+            errorMsg += "Username is not valid";
         }
         else if (password == null){
-
+            errorMsg += "Password must be filled";
         }
         else {
             boolean succeed = connections.login(username, password, connectionId, handler);
             if (!succeed){
-
+                errorMsg += "Password incorrect";
             }
         }
         // next thing add error messages and build answer...
-        return "";
+
+        String receipt = searchAndCut(msgComps, 8, "receipt");
+
+        String output = "";
+        if(errorMsg.equals("")) {
+            if(receipt == null)
+                output = "CONNECTED\nversion:1.2\n\n\u0000";
+            else
+                output = "CONNECTED\nversion:1.2\n\nreciept-id:" + receipt + "\n\u0000";
+        } else {
+            output = createErrorFrame(receipt, "error with login", message, errorMsg);
+        }
+
+        return output;
+    }
+
+    private String searchAndCut(String[] msgComps, int subStart, String target) {
+        String answer = null;
+        for (String s: msgComps){
+            if (s.contains(target)){
+                answer = s.substring(subStart);
+                break;
+            }
+        }
+        return answer;
+    }
+
+    private String createErrorFrame(String receiptId, String message, String theMessage, String errExp) {
+        //if recieptid is null then theres no recet header
+        String recStr = "";
+        if(receiptId != null) {
+            recStr = "reciept-id:" + receiptId;
+        }
+
+        //disconnect
+
+        return "ERROR\n" + recStr + "\nmessage:" + message + 
+        "\n\nThe message:\n-----\n" + theMessage + 
+        "\n-----\n" + errExp + "\n\u0000";
     }
 
     private String proccessSend(String[] msgComps) {
