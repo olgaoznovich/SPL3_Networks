@@ -12,6 +12,8 @@ public class StompProtocol implements StompMessagingProtocol<String> {
     private Connections<String> connections;
     private ConnectionHandler<String> handler;
 
+    private String[] msg;
+
     public void start(int connectionId, Connections<String> connections) {
         this.connectionId = connectionId;
         this.connections = connections;
@@ -19,9 +21,10 @@ public class StompProtocol implements StompMessagingProtocol<String> {
     
     public String process(String message) {
         String[] msgComponents = message.split(System.lineSeparator());
+        this.msg = msgComponents;
         String result = "";
         switch(msgComponents[0]) {
-            case ("CONNECT"): {result = proccessConnect(msgComponents, message); break;}
+            case ("CONNECT"): {result = proccessConnect(message); break;}
             case ("SEND"): {result = proccessSend(msgComponents); break;}
             case ("SUBSCRIBE"): {result = proccessSubscribe(msgComponents); break;}
             case ("UNSUBSCRIBE"): {result = proccessUnsubscribe(msgComponents);  break;}
@@ -31,13 +34,13 @@ public class StompProtocol implements StompMessagingProtocol<String> {
         return result;
     }
     
-    private String proccessConnect(String[] msgComps, String message) {
+    private String proccessConnect(String message) {
         String errorMsg = "";
         // recognize username header
-        String username = searchAndCut(msgComps, USERNAME_BEGIN_INDEX, "login");
+        String username = searchAndCut(USERNAME_BEGIN_INDEX, "login");
         
         // recognize password header
-        String password = searchAndCut(msgComps, PASSWORD_BEGIN_INDEX, "password");
+        String password = searchAndCut(PASSWORD_BEGIN_INDEX, "password");
         
         if (username == null){
             errorMsg += "Username is not valid";
@@ -53,24 +56,21 @@ public class StompProtocol implements StompMessagingProtocol<String> {
         }
         // next thing add error messages and build answer...
 
-        String receipt = searchAndCut(msgComps, 8, "receipt");
+        String receipt = searchAndCut(8, "receipt");
 
         String output = "";
         if(errorMsg.equals("")) {
-            if(receipt == null)
-                output = "CONNECTED\nversion:1.2\n\n\u0000";
-            else
-                output = "CONNECTED\nversion:1.2\n\nreciept-id:" + receipt + "\n\u0000";
+            output = "CONNECTED\nversion:1.2\n"+ receipt + "\n\u0000";
         } else {
-            output = createErrorFrame(receipt, "error with login", message, errorMsg);
+            output = createErrorFrame("error with login", message, errorMsg);
         }
 
         return output;
     }
 
-    private String searchAndCut(String[] msgComps, int subStart, String target) {
+    private String searchAndCut(int subStart, String target) {
         String answer = null;
-        for (String s: msgComps){
+        for (String s: msg){
             if (s.contains(target)){
                 answer = s.substring(subStart);
                 break;
@@ -79,18 +79,29 @@ public class StompProtocol implements StompMessagingProtocol<String> {
         return answer;
     }
 
-    private String createErrorFrame(String receiptId, String message, String theMessage, String errExp) {
+    private String createErrorFrame(String message, String theMessage, String errExp) {
         //if recieptid is null then theres no recet header
-        String recStr = "";
-        if(receiptId != null) {
-            recStr = "reciept-id:" + receiptId;
+        String recStr = checkRecipient();
+
+        disconnect();
+
+        return "ERROR" + recStr + "\nmessage:" + message +
+            "\n\nThe message:\n-----\n" + theMessage +
+            "\n-----\n" + errExp + "\n\u0000";
+    }
+
+    private String checkRecipient(){
+        String recStr = searchAndCut(8, "receipt");
+        if (recStr == null){
+            return "";
         }
+        else return "\nreciept-id:" + recStr;
+    }
 
-        //disconnect
 
-        return "ERROR\n" + recStr + "\nmessage:" + message + 
-        "\n\nThe message:\n-----\n" + theMessage + 
-        "\n-----\n" + errExp + "\n\u0000";
+    private void disconnect(){
+        connections.disconnect(connectionId);
+        shouldTerminate = true;
     }
 
     private String proccessSend(String[] msgComps) {
@@ -98,6 +109,9 @@ public class StompProtocol implements StompMessagingProtocol<String> {
     }
 
     private String proccessSubscribe(String[] msgComps) {
+        String topic = searchAndCut(13, "destination");
+        String id = searchAndCut(3, "id");
+        connections.subscribe(topic, connectionId, id);
         return "";
     }
 
