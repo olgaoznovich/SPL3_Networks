@@ -17,5 +17,6 @@ public class StompServer {
                 true);
         Server<String> server = stringServerFactory.getServer();
         server.serve();
+
     }
 }

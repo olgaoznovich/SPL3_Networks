@@ -1,5 +1,8 @@
 package bgu.spl.net.srv;
 
+import bgu.spl.net.impl.stomp.IdConnectionId;
+import bgu.spl.net.impl.stomp.TopicConnectionId;
+
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -12,9 +15,8 @@ public class ConnectionsImpl implements Connections<String> {
     private ConcurrentHashMap<Integer, ConnectionHandler<String>> connectedUsers;
     private ConcurrentHashMap<String, String> registeredUsers;
     private ConcurrentHashMap<String, HashSet<Integer>> topicSubs; //<topic, Set<connectionId>>
-    private ConcurrentHashMap<String, ConcurrentHashMap<Integer, Integer>> topicToId;  //<topic, cId, id>
-    private ConcurrentHashMap<Integer, ConcurrentHashMap<Integer, String>> idToTopic; //<id, cId, topic>
-
+    private ConcurrentHashMap<TopicConnectionId, Integer> topicToId;
+    private ConcurrentHashMap<IdConnectionId, String> idToTopic;
     public ConnectionsImpl() {
         idCounter = 0;
         connectedUsers = new ConcurrentHashMap<>();
@@ -25,17 +27,23 @@ public class ConnectionsImpl implements Connections<String> {
     }
 
     public boolean send(int connectionId, String msg){ 
-        //todo: implement
+        connectedUsers.get(connectionId).send(msg);
         return false;
     }
 
     public void send(String channel, String msg) {
         //todo: implement
+        HashSet<Integer> subbs = topicSubs.get(channel);
+        for (Integer sub : subbs){
+            send(sub, msg);
+        }
     }
 
     public void disconnect(int connectionId) {
-        for(ConcurrentHashMap<Integer, Integer> s : topicToId.values()) {
-            s.remove(connectionId);
+        for (TopicConnectionId s : topicToId.keySet()){
+            if (s.getConnectionID() == connectionId){
+                topicToId.remove(s);
+            }
         }
         connectedUsers.remove(connectionId);
     }
@@ -54,14 +62,29 @@ public class ConnectionsImpl implements Connections<String> {
 
     @Override
     public void subscribe(String topic, int connectionId, String id) {
-        Integer idInt = Integer.parseInt(id);
-        ConcurrentHashMap<Integer, String> ciDtoTopic = idToTopic.get(id);
-        if (ciDtoTopic == null){
-            ciDtoTopic = new ConcurrentHashMap<>();
+        int idInt = Integer.parseInt(id);
+        idToTopic.put(new IdConnectionId(idInt, connectionId), topic);
+        topicToId.put(new TopicConnectionId(topic, connectionId), idInt);
+        if (!topicSubs.containsKey(topic)){
+            HashSet<Integer> connections = new HashSet<>();
+            topicSubs.put(topic, connections);
         }
+        topicSubs.get(topic).add(connectionId);
 
-        topicToId.get(connectionId).put(connectionId, idInt);
-        idToTopic.get(id).put(connectionId, topic);
+    }
+
+    @Override
+    public void unsubscribe(int connectionId, String id) {
+        int idInt = Integer.parseInt(id);
+        IdConnectionId idConnectionId = new IdConnectionId(idInt, connectionId);
+
+        String topic = idToTopic.get(idConnectionId);
+        TopicConnectionId topicConnectionId = new TopicConnectionId(topic, connectionId);
+
+        idToTopic.remove(idConnectionId);
+        topicToId.remove(topicConnectionId);
+
+        topicSubs.get(topic).remove(connectionId);
     }
 
     public int assignId() {

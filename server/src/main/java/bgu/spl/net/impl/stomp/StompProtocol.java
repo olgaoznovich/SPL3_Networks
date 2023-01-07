@@ -25,10 +25,10 @@ public class StompProtocol implements StompMessagingProtocol<String> {
         String result = "";
         switch(msgComponents[0]) {
             case ("CONNECT"): {result = proccessConnect(message); break;}
-            case ("SEND"): {result = proccessSend(msgComponents); break;}
-            case ("SUBSCRIBE"): {result = proccessSubscribe(msgComponents); break;}
-            case ("UNSUBSCRIBE"): {result = proccessUnsubscribe(msgComponents);  break;}
-            case ("DISCONNECT"): {result = proccessDisconnect(msgComponents); break;}
+            case ("SEND"): {result = proccessSend(); break;}
+            case ("SUBSCRIBE"): {result = proccessSubscribe(); break;}
+            case ("UNSUBSCRIBE"): {result = proccessUnsubscribe();  break;}
+            case ("DISCONNECT"): {result = proccessDisconnect(); break;}
             default: 
         }
         return result;
@@ -104,22 +104,34 @@ public class StompProtocol implements StompMessagingProtocol<String> {
         shouldTerminate = true;
     }
 
-    private String proccessSend(String[] msgComps) {
+    private String proccessSend() {
+        int index = 0;
+        for (int i = 0; i < msg.length; i++){
+            if (msg[i].equals("")){
+                index = i + 1;
+            }
+        }
+        String topic = searchAndCut(13, "destination");
+        String message = msg[index];
+        connections.send(topic, message);
         return "";
     }
 
-    private String proccessSubscribe(String[] msgComps) {
+    private String proccessSubscribe() {
         String topic = searchAndCut(13, "destination");
         String id = searchAndCut(3, "id");
         connections.subscribe(topic, connectionId, id);
         return "";
     }
 
-    private String proccessUnsubscribe(String[] msgComps) {
+    private String proccessUnsubscribe() {
+        String id = searchAndCut(3, "id");
+        connections.unsubscribe(connectionId, id);
         return "";
     }
 
-    private String proccessDisconnect(String[] msgComps) {
+    private String proccessDisconnect() {
+        connections.disconnect(connectionId);
         return "";
     }
 	

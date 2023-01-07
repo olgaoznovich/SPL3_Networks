@@ -13,4 +13,6 @@ public interface Connections<T> {
     boolean login(String username, String password, int connectionId, ConnectionHandler<T> handler );
 
     void subscribe(T topic, int connectionId, T id);
+
+    void unsubscribe(int connectionId, String id);
 }
