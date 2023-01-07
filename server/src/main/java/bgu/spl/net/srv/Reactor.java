@@ -23,7 +23,7 @@ public class Reactor<T> implements Server<T> {
     private Thread selectorThread;
     private final ConcurrentLinkedQueue<Runnable> selectorTasks = new ConcurrentLinkedQueue<>();
 
-    private Connections<String> connections;
+    private Connections<T> connections;
 
     public Reactor(
             int numThreads,
@@ -98,9 +98,13 @@ public class Reactor<T> implements Server<T> {
     private void handleAccept(ServerSocketChannel serverChan, Selector selector) throws IOException {
         SocketChannel clientChan = serverChan.accept();
         clientChan.configureBlocking(false);
+
+        StompMessagingProtocol<T> p = protocolFactory.get();
+        p.start(connections.assignId(), connections);
+
         final NonBlockingConnectionHandler<T> handler = new NonBlockingConnectionHandler<>(
                 readerFactory.get(),
-                protocolFactory.get(),
+                p,
                 clientChan,
                 this);
         clientChan.register(selector, SelectionKey.OP_READ, handler);

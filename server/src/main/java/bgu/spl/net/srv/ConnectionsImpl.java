@@ -9,10 +9,10 @@ import java.util.HashSet;
 import java.util.concurrent.ConcurrentHashMap;
 
 
-public class ConnectionsImpl implements Connections<String> {
+public class ConnectionsImpl<T> implements Connections<T> {
 
     private int idCounter;
-    private ConcurrentHashMap<Integer, ConnectionHandler<String>> connectedUsers;
+    private ConcurrentHashMap<Integer, ConnectionHandler<T>> connectedUsers;
     private ConcurrentHashMap<String, String> registeredUsers;
     private ConcurrentHashMap<String, HashSet<Integer>> topicSubs; //<topic, Set<connectionId>>
     private ConcurrentHashMap<TopicConnectionId, Integer> topicToId;
@@ -26,12 +26,12 @@ public class ConnectionsImpl implements Connections<String> {
         idToTopic = new ConcurrentHashMap<>();
     }
 
-    public boolean send(int connectionId, String msg){ 
+    public boolean send(int connectionId, T msg){ 
         connectedUsers.get(connectionId).send(msg);
         return false;
     }
 
-    public void send(String channel, String msg) {
+    public void send(String channel, T msg) {
         //todo: implement
         HashSet<Integer> subbs = topicSubs.get(channel);
         for (Integer sub : subbs){
@@ -48,7 +48,7 @@ public class ConnectionsImpl implements Connections<String> {
         connectedUsers.remove(connectionId);
     }
 
-    public boolean login(String username, String password, int connectionId, ConnectionHandler<String> handler) {
+    public boolean login(String username, String password, int connectionId, ConnectionHandler<T> handler) {
         if(registeredUsers.containsKey(username)) {
             if(!password.equals(registeredUsers.get(username))) {
                 return false;

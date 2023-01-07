@@ -15,4 +15,6 @@ public interface Connections<T> {
     void subscribe(String topic, int connectionId, String id);
 
     void unsubscribe(int connectionId, String id);
+
+    int assignId();
 }
