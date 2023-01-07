@@ -8,7 +8,8 @@ import bgu.spl.net.srv.ServerFactory;
 public class StompServer {
 
     public static void main(String[] args) {
-        int port = Integer.parseInt(args[0]);
+        // int port = Integer.parseInt(args[0]);
+        int port = 7777;
         int numberOfThreads = 3;
         ServerFactory<String> stringServerFactory = new ServerFactory<>(numberOfThreads,
                 port,

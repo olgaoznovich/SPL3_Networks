@@ -25,7 +25,7 @@ public class ServerFactory<T> {
     }
 
     public Server<T> getServer(){
-        if (bool) return new Reactor<>(numThreads, port, protocolFactory, readerFactory);
+        if(bool)return Server.reactor(numThreads, port, protocolFactory, readerFactory);
         else return Server.threadPerClient(port,protocolFactory, readerFactory);
     }
 
