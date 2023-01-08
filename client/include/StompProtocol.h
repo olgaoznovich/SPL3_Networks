@@ -13,6 +13,6 @@ public:
     StompProtocol();
     std::string createFrame(std::string command);
     std::string parseFrame(std::string frame);
-    bool shouldTerminate();
+    bool getShouldTerminate();
     void setShouldTerminate(bool value);
 };
