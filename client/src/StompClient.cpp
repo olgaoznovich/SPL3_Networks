@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include "../include/ConnectionHandler.h"
 #include "../include/ReadFromKeyboard.h"
+#include "../include/ReadFromSocket.h"
 #include "../include/StompProtocol.h"
 #include <thread>
 
@@ -26,10 +27,13 @@ int main(int argc, char *argv[]) {
 
 	StompProtocol protocol;
 	ReadFromKeyboard keyboard(connectionHandler, protocol);
+	ReadFromSocket socket(connectionHandler, protocol);
 
-	std::thread t(&ReadFromKeyboard::Run, &keyboard);
+	std::thread keyboardThread(&ReadFromKeyboard::Run, &keyboard);
+	std::thread socketThread(&ReadFromSocket::Run, &keyboard);
 
-	t.join();
-	
+	keyboardThread.join();
+	socketThread.join();
+
 	return 0;
 }
