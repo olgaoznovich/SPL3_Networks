@@ -1,4 +1,4 @@
-#include "include/StompProtocol.h"
+#include "../include/StompProtocol.h"
 
 StompProtocol::StompProtocol() {}
 

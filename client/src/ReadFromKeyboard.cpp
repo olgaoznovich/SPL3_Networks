@@ -1,4 +1,4 @@
-#include "include/ReadFromKeyboard.h"
+#include "../include/ReadFromKeyboard.h"
 
 ReadFromKeyboard::ReadFromKeyboard(ConnectionHandler &conHandler, StompProtocol &protocol) : conHandler(conHandler), shouldTerminate(false), protocol(protocol)
 {

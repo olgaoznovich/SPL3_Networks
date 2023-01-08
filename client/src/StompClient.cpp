@@ -14,7 +14,8 @@ int main(int argc, char *argv[]) {
     // std::string host = argv[1];
     // short port = atoi(argv[2]);
 
-	std::string host = "stomp.cs.bgu.ac.il";
+	// std::string host = "stomp.cs.bgu.ac.il";
+	std::string host = "127.0.0.1";
 	short port = 7777;
     
     ConnectionHandler connectionHandler(host, port);
@@ -28,5 +29,7 @@ int main(int argc, char *argv[]) {
 
 	std::thread t(&ReadFromKeyboard::Run, &keyboard);
 
+	t.join();
+	
 	return 0;
 }
