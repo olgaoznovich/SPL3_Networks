@@ -9,6 +9,7 @@ void ReadFromKeyboard::Run()
 {
     while(!shouldTerminate)
     {
+        std::cout << "enter command" << std::endl;
         const short bufsize = 1024;
         char buf[bufsize];
         std::cin.getline(buf, bufsize);

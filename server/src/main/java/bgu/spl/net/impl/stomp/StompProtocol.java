@@ -20,6 +20,7 @@ public class StompProtocol implements StompMessagingProtocol<String> {
     }
     
     public String process(String message) {
+        System.out.println("recieved " + message);
         String[] msgComponents = message.split(System.lineSeparator());
         this.msg = msgComponents;
         String result = "";

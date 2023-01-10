@@ -8,9 +8,10 @@ std::string StompProtocol::createFrame(std::string command)
     //we assume the command input is legal
     vector<string> strComps = split(command, ' ');
     string keyword = strComps.at(0);
+    string output = "";
     if(keyword == "login") 
     {
-        processLogin(strComps);
+        output = processLogin(strComps);
     } else if (keyword == "join")
     {
         processJoin(strComps);
@@ -28,6 +29,7 @@ std::string StompProtocol::createFrame(std::string command)
 
     } 
 
+    return output;
 }
 
 std::string StompProtocol::parseFrame(std::string frame)
@@ -64,7 +66,7 @@ std::vector<std::string> StompProtocol::split(std::string s, char del)
 string StompProtocol::processLogin(vector<string> vec)
 {
     //build CONNECT frame
-    return "CONNECT\naccept-version:1.2\nhost:stomp.cs.bgu.ac.il\nlogin:" + vec.at(2) + "\npasscode:" + vec.at(3);
+    return "CONNECT\naccept-version:1.2\nhost:stomp.cs.bgu.ac.il\nlogin:" + vec.at(2) + "\npasscode:" + vec.at(3) + "\n\n" + '\0';
 } 
 
 string StompProtocol::processJoin(vector<string> vec)

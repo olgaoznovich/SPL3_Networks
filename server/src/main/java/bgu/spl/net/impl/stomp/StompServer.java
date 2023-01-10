@@ -15,7 +15,7 @@ public class StompServer {
                 port,
                 StompProtocol::new,
                 LineMessageEncoderDecoder::new,
-                true);
+                false);
         Server<String> server = stringServerFactory.getServer();
         server.serve();
 
