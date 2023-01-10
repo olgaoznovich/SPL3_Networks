@@ -100,13 +100,15 @@ public class Reactor<T> implements Server<T> {
         clientChan.configureBlocking(false);
 
         StompMessagingProtocol<T> p = protocolFactory.get();
-        p.start(connections.assignId(), connections);
 
         final NonBlockingConnectionHandler<T> handler = new NonBlockingConnectionHandler<>(
                 readerFactory.get(),
                 p,
                 clientChan,
                 this);
+
+        p.start(connections.assignId(), connections, handler);
+
         clientChan.register(selector, SelectionKey.OP_READ, handler);
     }
 

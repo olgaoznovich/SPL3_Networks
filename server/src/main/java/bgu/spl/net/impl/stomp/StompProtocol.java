@@ -14,9 +14,10 @@ public class StompProtocol implements StompMessagingProtocol<String> {
 
     private String[] msg;
 
-    public void start(int connectionId, Connections<String> connections) {
+    public void start(int connectionId, Connections<String> connections, ConnectionHandler<String> handler) {
         this.connectionId = connectionId;
         this.connections = connections;
+        this.handler = handler;
     }
     
     public String process(String message) {
@@ -41,7 +42,7 @@ public class StompProtocol implements StompMessagingProtocol<String> {
         String username = searchAndCut(USERNAME_BEGIN_INDEX, "login");
         
         // recognize password header
-        String password = searchAndCut(PASSWORD_BEGIN_INDEX, "password");
+        String password = searchAndCut(PASSWORD_BEGIN_INDEX, "passcode");
         
         if (username == null){
             errorMsg += "Username is not valid";
@@ -61,7 +62,7 @@ public class StompProtocol implements StompMessagingProtocol<String> {
 
         String output = "";
         if(errorMsg.equals("")) {
-            output = "CONNECTED\nversion:1.2\n"+ receipt + "\n\u0000";
+            output = "CONNECTED\nversion:1.2\n"+ receipt + "\n" + '\u0000';
         } else {
             output = createErrorFrame("error with login", message, errorMsg);
         }

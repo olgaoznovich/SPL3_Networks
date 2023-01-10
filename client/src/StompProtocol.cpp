@@ -34,8 +34,16 @@ std::string StompProtocol::createFrame(std::string command)
 
 std::string StompProtocol::parseFrame(std::string frame)
 {
-
+    vector<string> strComps = split(frame, '\n');
+    string keyword = strComps.at(0);
+    string output = "";
+    if(keyword == "CONNECTED") {
+        output = "login successful";
+    }
+    return output;
 }
+
+
 
 bool StompProtocol::getShouldTerminate()
 {
