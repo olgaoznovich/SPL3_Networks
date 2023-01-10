@@ -1,4 +1,4 @@
-#include "include/ReadFromSocket.h"
+#include "../include/ReadFromSocket.h"
 
 ReadFromSocket::ReadFromSocket(ConnectionHandler &conHandler, StompProtocol &protocol) : conHandler(conHandler), protocol(protocol), shouldTerminate(false) 
 {

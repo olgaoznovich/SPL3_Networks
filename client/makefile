@@ -3,8 +3,8 @@ LDFLAGS:=-lboost_system -lpthread
 
 all: StompWCIClient
 
-StompWCIClient: bin/ConnectionHandler.o bin/StompClient.o bin/event.o bin/ReadFromKeyboard.o bin/StompProtocol.o
-	g++ -o bin/StompWCIClient bin/ConnectionHandler.o  bin/StompClient.o bin/ReadFromKeyboard.o bin/StompProtocol.o $(LDFLAGS)
+StompWCIClient: bin/ConnectionHandler.o bin/StompClient.o bin/event.o bin/ReadFromKeyboard.o bin/StompProtocol.o bin/ReadFromSocket.o
+	g++ -o bin/StompWCIClient bin/ConnectionHandler.o  bin/StompClient.o bin/ReadFromKeyboard.o bin/StompProtocol.o bin/ReadFromSocket.o $(LDFLAGS)
 
 bin/ConnectionHandler.o: src/ConnectionHandler.cpp
 	g++ $(CFLAGS) -o bin/ConnectionHandler.o src/ConnectionHandler.cpp
@@ -24,6 +24,8 @@ bin/StompProtocol.o: src/StompProtocol.cpp
 bin/ReadFromKeyboard.o: src/ReadFromKeyboard.cpp
 	g++ $(CFLAGS) -o bin/ReadFromKeyboard.o src/ReadFromKeyboard.cpp
 
+bin/ReadFromSocket.o: src/ReadFromSocket.cpp
+	g++ $(CFLAGS) -o bin/ReadFromSocket.o src/ReadFromSocket.cpp
 
 
 .PHONY: clean
