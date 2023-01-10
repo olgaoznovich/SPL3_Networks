@@ -21,7 +21,6 @@ public class StompProtocol implements StompMessagingProtocol<String> {
     }
     
     public String process(String message) {
-        System.out.println("recieved " + message);
         String[] msgComponents = message.split(System.lineSeparator());
         this.msg = msgComponents;
         String result = "";
@@ -71,7 +70,7 @@ public class StompProtocol implements StompMessagingProtocol<String> {
     }
 
     private String searchAndCut(int subStart, String target) {
-        String answer = null;
+        String answer = "";
         for (String s: msg){
             if (s.contains(target)){
                 answer = s.substring(subStart);

@@ -15,10 +15,11 @@ int main(int argc, char *argv[]) {
     // std::string host = argv[1];
     // short port = atoi(argv[2]);
 
+	
 	// std::string host = "stomp.cs.bgu.ac.il";
 	std::string host = "127.0.0.1";
 	short port = 7777;
-    
+    //host and port not neccessaricly constant so maybe they have to be midified after first login. LOOK INTO IT!
     ConnectionHandler connectionHandler(host, port);
     if (!connectionHandler.connect()) {
         std::cerr << "Cannot connect to " << host << ":" << port << std::endl;
