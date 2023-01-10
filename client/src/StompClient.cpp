@@ -30,7 +30,7 @@ int main(int argc, char *argv[]) {
 	ReadFromSocket socket(connectionHandler, protocol);
 
 	std::thread keyboardThread(&ReadFromKeyboard::Run, &keyboard);
-	std::thread socketThread(&ReadFromSocket::Run, &keyboard);
+	std::thread socketThread(&ReadFromSocket::Run, &socket);
 
 	keyboardThread.join();
 	socketThread.join();
