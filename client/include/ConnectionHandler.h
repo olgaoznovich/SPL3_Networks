@@ -8,10 +8,11 @@ using boost::asio::ip::tcp;
 
 class ConnectionHandler {
 private:
-	 std::string host_;
-	 short port_;
+	std::string host_;
+	short port_;
 	boost::asio::io_service io_service_;   // Provides core I/O functionality
 	tcp::socket socket_;
+	bool isInit;
 
 public:
 	ConnectionHandler(std::string host, short port);
@@ -48,6 +49,10 @@ public:
 	void setPort(int port);
 
 	void setHost(std::string host);
+
+	bool getIsInit();
+
+	void setIsInit(bool newValue);
 
 	// Close down the connection properly.
 	void close();

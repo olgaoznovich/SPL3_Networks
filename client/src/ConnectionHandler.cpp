@@ -8,7 +8,7 @@ using std::cerr;
 using std::endl;
 using std::string;
 
-ConnectionHandler::ConnectionHandler(string host, short port) : host_(host), port_(port), io_service_(),
+ConnectionHandler::ConnectionHandler(string host, short port) : host_(host), port_(port), io_service_(), isInit(false),
                                                                 socket_(io_service_) {}
 
 ConnectionHandler::~ConnectionHandler() {
@@ -106,6 +106,16 @@ void ConnectionHandler::setHost(std::string host)
 void ConnectionHandler::setPort(int port)
 {
 	port_ = port;
+}
+
+void ConnectionHandler::setIsInit(bool newValue)
+{
+	isInit = newValue;
+}
+
+bool ConnectionHandler::getIsInit()
+{
+	return isInit;
 }
 
 // Close down the connection properly.
