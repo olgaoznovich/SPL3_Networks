@@ -98,6 +98,16 @@ bool ConnectionHandler::sendFrameAscii(const std::string &frame, char delimiter)
 	return sendBytes(&delimiter, 1);
 }
 
+void ConnectionHandler::setHost(std::string host)
+{
+	host_ = host;
+}
+
+void ConnectionHandler::setPort(int port)
+{
+	port_ = port;
+}
+
 // Close down the connection properly.
 void ConnectionHandler::close() {
 	try {

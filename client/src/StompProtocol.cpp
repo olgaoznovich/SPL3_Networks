@@ -102,3 +102,14 @@ string StompProtocol::processLogout(vector<string> vec)
     return "";
 } 
 
+vector<string> StompProtocol::isLoginCommand(std::string command)
+{
+    vector<string> strComps = split(command, ' ');
+    vector<string> output;
+    if(strComps.at(0) == "login")
+    {
+        return split(strComps.at(1), ':');
+    }
+
+    return output;
+}

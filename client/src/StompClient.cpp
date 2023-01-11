@@ -1,40 +1,58 @@
 #include <stdlib.h>
 #include "../include/ConnectionHandler.h"
-#include "../include/ReadFromKeyboard.h"
 #include "../include/ReadFromSocket.h"
 #include "../include/StompProtocol.h"
 #include <thread>
 
 int main(int argc, char *argv[]) {
-	// TODO: implement the STOMP client
-
-	// if (argc < 3) {
-    //     std::cerr << "Usage: " << argv[0] << " host port" << std::endl << std::endl;
-    //     return -1;
-    // }
-    // std::string host = argv[1];
-    // short port = atoi(argv[2]);
-
-	
-	// std::string host = "stomp.cs.bgu.ac.il";
-	std::string host = "127.0.0.1";
-	short port = 7777;
-    //host and port not neccessaricly constant so maybe they have to be midified after first login. LOOK INTO IT!
-    ConnectionHandler connectionHandler(host, port);
-    if (!connectionHandler.connect()) {
-        std::cerr << "Cannot connect to " << host << ":" << port << std::endl;
-        return 1;
-    }
-
+	ConnectionHandler connectionHandler("",0);
 	StompProtocol protocol;
-	ReadFromKeyboard keyboard(connectionHandler, protocol);
-	ReadFromSocket socket(connectionHandler, protocol);
+	bool isConHandlerInit = false;
+	//TODO: when disconnect command issued, set isInit to false again!!
+	while(1)
+    {
+        std::cout << "enter command" << std::endl;
+        const short bufsize = 1024;
+        char buf[bufsize];
+        std::cin.getline(buf, bufsize);
+		std::string line(buf);
+		int len=line.length();
 
-	std::thread keyboardThread(&ReadFromKeyboard::Run, &keyboard);
-	std::thread socketThread(&ReadFromSocket::Run, &socket);
+        std::vector<std::string> hostAndPort = protocol.isLoginCommand(line);
 
-	keyboardThread.join();
-	socketThread.join();
+		ConnectionHandler connectionHandler1("", 0);
+
+        if(hostAndPort.size() > 0)
+        {
+            std::string host = hostAndPort.at(0);
+            short port = stoi(hostAndPort.at(1));
+            connectionHandler.setPort(port);
+			connectionHandler.setHost(host);
+			isConHandlerInit = true;
+			// connectionHandler1(host,port);
+            if (!connectionHandler.connect()) {
+                std::cerr << "Cannot connect to " << host << ":" << port << std::endl;
+				
+            }                
+            
+            ReadFromSocket socket(connectionHandler, protocol);
+            std::thread socketThread(&ReadFromSocket::Run, &socket);
+            
+
+        }
+
+		if(isConHandlerInit) {
+        std::string frame = protocol.createFrame(line);
+        //execute sendLine only!! if the command is correct and frame was built
+        //for example if there was an error on client side, createframe will return "" and sendLIne wont be executed
+        if (!connectionHandler.sendLine(frame)) {
+            std::cout << "Disconnected. Exiting...\n" << std::endl;
+            // shouldTerminate = true;
+        }
+		// connectionHandler.sendLine(line) appends '\n' to the message. Therefor we send len+1 bytes.
+        std::cout << "Sent " << len+1 << " bytes to server" << std::endl;
+		}
+    }
 
 	return 0;
 }

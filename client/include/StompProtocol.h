@@ -2,6 +2,7 @@
 
 #include "../include/ConnectionHandler.h"
 #include <string>
+#include <vector>
 
 
 // TODO: implement the STOMP protocol
@@ -23,4 +24,6 @@ public:
     std::string parseFrame(std::string frame);
     bool getShouldTerminate();
     void setShouldTerminate(bool value);
+    std::vector<std::string> isLoginCommand(std::string command);
+
 };
