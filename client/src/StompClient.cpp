@@ -2,12 +2,14 @@
 #include "../include/ConnectionHandler.h"
 #include "../include/ReadFromSocket.h"
 #include "../include/StompProtocol.h"
+#include "../include/User.h"
 #include <thread>
 
 int main(int argc, char *argv[]) {
 	ConnectionHandler connectionHandler("",0);
 	StompProtocol protocol;
-	ReadFromSocket socket(connectionHandler, protocol);
+	User user;
+	ReadFromSocket socket(connectionHandler, protocol, user);
 	std::thread socketThread(&ReadFromSocket::Run, &socket);
 
 	//TODO: when disconnect command issued, set isInit to false again!!
@@ -22,7 +24,7 @@ int main(int argc, char *argv[]) {
 
         std::vector<std::string> hostAndPort = protocol.isLoginCommand(line);
 
-        if(hostAndPort.size() > 0)
+        if(hostAndPort.size() > 0 && !connectionHandler.getIsInit())
         {
             std::string host = hostAndPort.at(0);
             short port = stoi(hostAndPort.at(1));
@@ -34,10 +36,10 @@ int main(int argc, char *argv[]) {
 				
             }                
         }
-		
+
 		if(connectionHandler.getIsInit()) {
 			std::cout << "before createFrame" << std::endl;
-			std::string frame = protocol.createFrame(line);
+			std::string frame = protocol.createFrame(line, user);
 			//execute sendLine only!! if the command is correct and frame was built
 			//for example if there was an error on client side, createframe will return "" and sendLIne wont be executed
 			if (!connectionHandler.sendLine(frame)) {

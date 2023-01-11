@@ -3,7 +3,7 @@ using namespace std;
 
 StompProtocol::StompProtocol() {}
 
-std::string StompProtocol::createFrame(std::string command) 
+std::string StompProtocol::createFrame(std::string command, User &user) 
 {
     //we assume the command input is legal
     vector<string> strComps = split(command, ' ');
@@ -26,19 +26,21 @@ std::string StompProtocol::createFrame(std::string command)
 
     } else if (keyword == "logout")
     {
-
+        output = processLogout(strComps, user);
     } 
 
     return output;
 }
 
-std::string StompProtocol::parseFrame(std::string frame)
+std::string StompProtocol::parseFrame(std::string frame, User &user)
 {
     vector<string> strComps = split(frame, '\n');
     string keyword = strComps.at(0);
     string output = "";
     if(keyword == "CONNECTED") {
         output = "login successful";
+    } else if (keyword == "RECEIPT") {
+        
     }
     return output;
 }
@@ -97,9 +99,15 @@ string StompProtocol::processSummary(vector<string> vec)
     return "";
 } 
 
-string StompProtocol::processLogout(vector<string> vec)
+string StompProtocol::processLogout(vector<string> vec, User &user)
 {
-    return "";
+    //assign rId
+    //add in user map <rid, 'logout'>
+    //parse frame
+    int rId = user.assignRId();
+    user.addReciept(rId, "logout");
+    
+    return "DISCONNECT\nreceipt: " + std::to_string(rId) + "\n\n" + '\0';
 } 
 
 vector<string> StompProtocol::isLoginCommand(std::string command)
@@ -112,4 +120,13 @@ vector<string> StompProtocol::isLoginCommand(std::string command)
     }
 
     return output;
+}
+
+int StompProtocol::getReciptId(std::string frame)
+{
+    vector<string> strComps = split(frame, '\n');
+    if(strComps.at(0) == "RECEIPT") {
+        return stoi(strComps.at(1).substr(11));
+    }
+    return -1;
 }

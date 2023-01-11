@@ -1,6 +1,6 @@
 #include "../include/ReadFromSocket.h"
 
-ReadFromSocket::ReadFromSocket(ConnectionHandler &conHandler, StompProtocol &protocol) : conHandler(conHandler), protocol(protocol), shouldTerminate(false) 
+ReadFromSocket::ReadFromSocket(ConnectionHandler &conHandler, StompProtocol &protocol, User &user) : conHandler(conHandler), protocol(protocol), shouldTerminate(false), user(user) 
 {
 
 }
@@ -20,18 +20,31 @@ void ReadFromSocket::Run()
             }
             
             //parse answer and return the reply according to it
-            answer = protocol.parseFrame(answer);
+            std::string replyToClient = protocol.parseFrame(answer, user);
 
-            int len=answer.length();
+            int rId = protocol.getReciptId(answer);
+            if(rId != -1)
+            {
+                //check the type of the receipt in user
+                //if "logout" - reset user, disconnect (handlerInit= false) from handler
+                std::string frameType = user.getReciept(rId);
+                if(frameType == "logout")
+                {
+                    user.resetUser();
+                    conHandler.setIsInit(false);
+                    std::cout << "disconnected user !!!!!!!!!!!" << std::endl;
+                } else
+                {
+                    user.removeReciept(rId);
+                }
+            }
+            int len=replyToClient.length();
             // A C string must end with a 0 char delimiter.  When we filled the answer buffer from the socket
             // we filled up to the \n char - we must make sure now that a 0 char is also present. So we truncate last character.
             // if(len > 0)
-            answer.resize(len-1);
-            std::cout << "Reply: " << answer << " " << len << " bytes " << std::endl << std::endl;
-            if (answer == "bye") {
-                std::cout << "Exiting...\n" << std::endl;
-                
-            }
+            replyToClient.resize(len-1);
+            std::cout << "Reply: " << replyToClient << " " << len << " bytes " << std::endl << std::endl;
+            
         }
     }
 }

@@ -133,7 +133,8 @@ public class StompProtocol implements StompMessagingProtocol<String> {
 
     private String proccessDisconnect() {
         connections.disconnect(connectionId);
-        return "";
+        String rId = searchAndCut(8, "receipt");
+        return "RECEIPT\nreceipt-id:" + rId + "\n\n" + '\u0000';
     }
 	
 	/**
