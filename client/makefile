@@ -1,7 +1,7 @@
 CFLAGS:=-c -Wall -Weffc++ -g -std=c++11 -Iinclude
 LDFLAGS:=-lboost_system -lpthread
 
-all: StompWCIClient
+all: clean StompWCIClient
 
 StompWCIClient: bin/ConnectionHandler.o bin/StompClient.o bin/event.o bin/StompProtocol.o bin/ReadFromSocket.o bin/User.o
 	g++ -o bin/StompWCIClient bin/ConnectionHandler.o  bin/StompClient.o bin/StompProtocol.o bin/ReadFromSocket.o bin/User.o bin/event.o $(LDFLAGS)

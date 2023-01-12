@@ -57,11 +57,14 @@ public class StompProtocol implements StompMessagingProtocol<String> {
         }
         // next thing add error messages and build answer...
 
-        String receipt = searchAndCut(8, "receipt");
+        String receipt = checkRecipient();
 
         String output = "";
         if(errorMsg.equals("")) {
-            output = "CONNECTED\nversion:1.2\n"+ receipt + "\n" + '\u0000';
+            //deleted null char bc encode (then send) adds it automatically
+            // output = "CONNECTED\nversion:1.2\n"+ receipt + "\n" + '\u0000';
+            output = "CONNECTED\nversion:1.2\n"+ receipt + "\n";
+
         } else {
             output = createErrorFrame("error with login", message, errorMsg);
         }
@@ -70,7 +73,7 @@ public class StompProtocol implements StompMessagingProtocol<String> {
     }
 
     private String searchAndCut(int subStart, String target) {
-        String answer = "";
+        String answer = null;
         for (String s: msg){
             if (s.contains(target)){
                 answer = s.substring(subStart);
@@ -88,7 +91,7 @@ public class StompProtocol implements StompMessagingProtocol<String> {
 
         return "ERROR" + recStr + "\nmessage:" + message +
             "\n\nThe message:\n-----\n" + theMessage +
-            "\n-----\n" + errExp + "\n\u0000";
+            "\n-----\n" + errExp + "\n";
     }
 
     private String checkRecipient(){
@@ -134,7 +137,7 @@ public class StompProtocol implements StompMessagingProtocol<String> {
     private String proccessDisconnect() {
         connections.disconnect(connectionId);
         String rId = searchAndCut(8, "receipt");
-        return "RECEIPT\nreceipt-id:" + rId + "\n\n" + '\u0000';
+        return "RECEIPT\nreceipt-id:" + rId + "\n\n";
     }
 	
 	/**

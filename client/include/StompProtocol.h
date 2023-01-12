@@ -27,5 +27,6 @@ public:
     bool getShouldTerminate();
     void setShouldTerminate(bool value);
     std::vector<std::string> isLoginCommand(std::string command);
+    bool isErrorFrame(std::string frame);
     int getReciptId(std::string frame);
 };

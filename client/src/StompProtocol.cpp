@@ -40,7 +40,9 @@ std::string StompProtocol::parseFrame(std::string frame, User &user)
     if(keyword == "CONNECTED") {
         output = "login successful";
     } else if (keyword == "RECEIPT") {
-        
+        output = "logout successful";
+    } else if (keyword == "ERROR") {
+        output = "ERROR OCCURED"; //todo: handle the rest!
     }
     return output;
 }
@@ -76,8 +78,13 @@ std::vector<std::string> StompProtocol::split(std::string s, char del)
 string StompProtocol::processLogin(vector<string> vec)
 {
     //build CONNECT frame
-    return "CONNECT\naccept-version:1.2\nhost:stomp.cs.bgu.ac.il\nlogin:" + vec.at(2) + "\npasscode:" + vec.at(3) + "\n\n" + '\0';
+    // return "CONNECT\naccept-version:1.2\nhost:stomp.cs.bgu.ac.il\nlogin:" + vec.at(2) + "\npasscode:" + vec.at(3) + "\n\n" + '\0';
+
+    return "CONNECT\naccept-version:1.2\nhost:stomp.cs.bgu.ac.il\nlogin:" + 
+            vec.at(2) + "\npasscode:" + vec.at(3) + "\n\n"; 
+            //removed null char bc sendAsciiFrame adds it automatically
 } 
+
 
 string StompProtocol::processJoin(vector<string> vec)
 {
@@ -107,7 +114,7 @@ string StompProtocol::processLogout(vector<string> vec, User &user)
     int rId = user.assignRId();
     user.addReciept(rId, "logout");
     
-    return "DISCONNECT\nreceipt: " + std::to_string(rId) + "\n\n" + '\0';
+    return "DISCONNECT\nreceipt: " + std::to_string(rId) + "\n\n";
 } 
 
 vector<string> StompProtocol::isLoginCommand(std::string command)
@@ -129,4 +136,10 @@ int StompProtocol::getReciptId(std::string frame)
         return stoi(strComps.at(1).substr(11));
     }
     return -1;
+}
+
+bool StompProtocol::isErrorFrame(std::string frame)
+{
+    vector<string> strComps = split(frame, '\n');
+    return strComps.at(0) == "ERROR";
 }

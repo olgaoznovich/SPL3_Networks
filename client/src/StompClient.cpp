@@ -30,15 +30,15 @@ int main(int argc, char *argv[]) {
             short port = stoi(hostAndPort.at(1));
             connectionHandler.setPort(port);
 			connectionHandler.setHost(host);
-			connectionHandler.setIsInit(true);
             if (!connectionHandler.connect()) {
                 std::cerr << "Cannot connect to " << host << ":" << port << std::endl;
 				
-            }                
+            } else {
+				connectionHandler.setIsInit(true);
+			}               
         }
 
 		if(connectionHandler.getIsInit()) {
-			std::cout << "before createFrame" << std::endl;
 			std::string frame = protocol.createFrame(line, user);
 			//execute sendLine only!! if the command is correct and frame was built
 			//for example if there was an error on client side, createframe will return "" and sendLIne wont be executed
@@ -47,7 +47,6 @@ int main(int argc, char *argv[]) {
 				// shouldTerminate = true;
 			}
 			// connectionHandler.sendLine(line) appends '\n' to the message. Therefor we send len+1 bytes.
-			std::cout << "Sent " << len+1 << " bytes to server" << std::endl;
 		}
     }
 	socketThread.join();
