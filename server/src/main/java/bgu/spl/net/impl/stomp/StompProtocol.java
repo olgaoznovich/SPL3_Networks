@@ -99,7 +99,7 @@ public class StompProtocol implements StompMessagingProtocol<String> {
         if (recStr == null){
             return "";
         }
-        else return "\nreciept-id:" + recStr;
+        else return recStr;
     }
 
 

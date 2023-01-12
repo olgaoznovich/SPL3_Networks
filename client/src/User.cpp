@@ -59,4 +59,5 @@ void User::resetUser()
     receiptIdCounter = 0;
     username = "";
     subIdCounter = 0;
+    //add reset to the dicts
 }
