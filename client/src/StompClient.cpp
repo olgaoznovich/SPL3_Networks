@@ -44,7 +44,6 @@ int main(int argc, char *argv[]) {
 			//for example if there was an error on client side, createframe will return "" and sendLIne wont be executed
 			if (!connectionHandler.sendLine(frame)) {
 				std::cout << "Disconnected. Exiting...\n" << std::endl;
-				// shouldTerminate = true;
 			}
 			// connectionHandler.sendLine(line) appends '\n' to the message. Therefor we send len+1 bytes.
 		}
