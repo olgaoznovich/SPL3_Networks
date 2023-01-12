@@ -125,18 +125,23 @@ public class StompProtocol implements StompMessagingProtocol<String> {
         String topic = searchAndCut(13, "destination");
         String id = searchAndCut(3, "id");
         connections.subscribe(topic, connectionId, id);
-        return "";
+
+        return createReceiptFrame();
     }
 
     private String proccessUnsubscribe() {
         String id = searchAndCut(3, "id");
         connections.unsubscribe(connectionId, id);
-        return "";
+        return createReceiptFrame();
     }
 
     private String proccessDisconnect() {
         connections.disconnect(connectionId);
-        String rId = searchAndCut(8, "receipt");
+        return createReceiptFrame();
+    }
+
+    private String createReceiptFrame() {
+        String rId = checkRecipient();
         return "RECEIPT\nreceipt-id:" + rId + "\n\n";
     }
 	

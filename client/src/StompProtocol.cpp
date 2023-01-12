@@ -14,7 +14,7 @@ std::string StompProtocol::createFrame(std::string command, User &user)
         output = processLogin(strComps);
     } else if (keyword == "join")
     {
-        processJoin(strComps);
+        processJoin(strComps, user);
     } else if (keyword == "exit")
     {
 
@@ -86,9 +86,14 @@ string StompProtocol::processLogin(vector<string> vec)
 } 
 
 
-string StompProtocol::processJoin(vector<string> vec)
+string StompProtocol::processJoin(vector<string> vec, User &user)
 {
-    return "";
+    int rId = user.assignRId();
+    int sId = user.assignSId();
+    std::string gameName = vec.at(1);
+    user.addReciept(rId, "join");
+    user.addSub(sId, gameName);
+    return "SUBSCRIBE\ndestination:/" + gameName + "\nid:" + std::to_string(sId) + "\nreceipt:" + std::to_string(rId) + "\n\n";
 } 
 
 string StompProtocol::processExit(vector<string> vec)
