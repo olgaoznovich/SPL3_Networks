@@ -11,13 +11,13 @@ std::string StompProtocol::createFrame(std::string command, User &user)
     string output = "";
     if(keyword == "login") 
     {
-        output = processLogin(strComps);
+        output = processLogin(strComps, user);
     } else if (keyword == "join")
     {
-        processJoin(strComps, user);
+        output = processJoin(strComps, user);
     } else if (keyword == "exit")
     {
-
+        output = processExit(strComps, user);
     } else if (keyword == "report")
     {
 
@@ -40,9 +40,10 @@ std::string StompProtocol::parseFrame(std::string frame, User &user)
     if(keyword == "CONNECTED") {
         output = "login successful";
     } else if (keyword == "RECEIPT") {
-        output = "logout successful";
+        int rId = getReciptId(frame);
+        output = user.getReciept(rId);
     } else if (keyword == "ERROR") {
-        output = "ERROR OCCURED"; //todo: handle the rest!
+        output = strComps.at(strComps.size() - 2); //todo: handle the rest!
     }
     return output;
 }
@@ -75,10 +76,11 @@ std::vector<std::string> StompProtocol::split(std::string s, char del)
     return vector;
 }
 
-string StompProtocol::processLogin(vector<string> vec)
+string StompProtocol::processLogin(vector<string> vec, User &user)
 {
     //build CONNECT frame
     // return "CONNECT\naccept-version:1.2\nhost:stomp.cs.bgu.ac.il\nlogin:" + vec.at(2) + "\npasscode:" + vec.at(3) + "\n\n" + '\0';
+    user.setUserName(vec.at(2));
 
     return "CONNECT\naccept-version:1.2\nhost:stomp.cs.bgu.ac.il\nlogin:" + 
             vec.at(2) + "\npasscode:" + vec.at(3) + "\n\n"; 
@@ -91,14 +93,24 @@ string StompProtocol::processJoin(vector<string> vec, User &user)
     int rId = user.assignRId();
     int sId = user.assignSId();
     std::string gameName = vec.at(1);
-    user.addReciept(rId, "join");
-    user.addSub(sId, gameName);
+    user.addReciept(rId, "joined " + gameName);
+    user.addSubId2Game(sId, gameName);
+    user.addSubGame2Id(gameName, sId);
     return "SUBSCRIBE\ndestination:/" + gameName + "\nid:" + std::to_string(sId) + "\nreceipt:" + std::to_string(rId) + "\n\n";
 } 
 
-string StompProtocol::processExit(vector<string> vec)
+string StompProtocol::processExit(vector<string> vec, User &user)
 {
-    return "";
+    int rId = user.assignRId();
+    std::string gameName = vec.at(1);
+    user.addReciept(rId, "Exited channel" + gameName);
+    int sId = user.getSubGame2Id(gameName);
+    if(sId >= 0) {
+        user.removeSubId2Game(sId);
+        user.removeSubGame2Id(gameName);
+    }
+    return "UNSUBSCRIBE\nid:" + std::to_string(sId) + "\receipt:" + std::to_string(rId) + "\n\n";
+
 } 
 
 string StompProtocol::processReport(vector<string> vec)
@@ -117,7 +129,7 @@ string StompProtocol::processLogout(vector<string> vec, User &user)
     //add in user map <rid, 'logout'>
     //parse frame
     int rId = user.assignRId();
-    user.addReciept(rId, "logout");
+    user.addReciept(rId, "logout successful");
     
     return "DISCONNECT\nreceipt: " + std::to_string(rId) + "\n\n";
 } 

@@ -1,6 +1,6 @@
 #include "../include/User.h"
 
-User::User() : receiptIdCounter(0), username(""), subIdCounter(0), subs(), reciepts()
+User::User() : receiptIdCounter(0), username(""), subIdCounter(0), subsId2Game(), reciepts()
 {
 }
 
@@ -39,19 +39,38 @@ void User::removeReciept(int receiptId)
     reciepts.erase(receiptId);
 }
 
-void User::addSub(int subId, std::string gameName)
+void User::addSubId2Game(int subId, std::string gameName)
 {
-    subs[subId] = gameName;
+    subsId2Game[subId] = gameName;
 }
 
-std::string User::getSub(int subId)
+std::string User::getSubId2Game(int subId)
 {
-    return subs[subId];
+    return subsId2Game[subId];
 }
 
-void User::removeSub(int subId)
+void User::removeSubId2Game(int subId)
 {
-    subs.erase(subId);
+    subsId2Game.erase(subId);
+}
+
+void User::addSubGame2Id(std::string gameName, int subId)
+{
+    subsGame2Id[gameName] = subId;
+}
+
+int User::getSubGame2Id(std::string gameName)
+{
+    if(subsGame2Id.count(gameName) > 0) {
+        return subsGame2Id[gameName];    
+    }
+    return -1;
+    
+}
+
+void User::removeSubGame2Id(std::string gameName)
+{
+    subsGame2Id.erase(gameName);
 }
 
 void User::resetUser()

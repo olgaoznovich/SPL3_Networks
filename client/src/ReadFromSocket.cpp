@@ -34,7 +34,7 @@ void ReadFromSocket::Run()
                     //check the type of the receipt in user
                     //if "logout" - reset user, disconnect (handlerInit= false) from handler
                     std::string frameType = user.getReciept(rId);
-                    if(frameType == "logout")
+                    if(frameType.find("logout") != std::string::npos)
                     {
                         user.resetUser();
                         conHandler.close();

@@ -13,6 +13,7 @@ public class StompProtocol implements StompMessagingProtocol<String> {
     private ConnectionHandler<String> handler;
 
     private String[] msg;
+    private String message;
 
     public void start(int connectionId, Connections<String> connections, ConnectionHandler<String> handler) {
         this.connectionId = connectionId;
@@ -23,9 +24,10 @@ public class StompProtocol implements StompMessagingProtocol<String> {
     public String process(String message) {
         String[] msgComponents = message.split(System.lineSeparator());
         this.msg = msgComponents;
+        this.message = message;
         String result = "";
         switch(msgComponents[0]) {
-            case ("CONNECT"): {result = proccessConnect(message); break;}
+            case ("CONNECT"): {result = proccessConnect(); break;}
             case ("SEND"): {result = proccessSend(); break;}
             case ("SUBSCRIBE"): {result = proccessSubscribe(); break;}
             case ("UNSUBSCRIBE"): {result = proccessUnsubscribe();  break;}
@@ -35,7 +37,7 @@ public class StompProtocol implements StompMessagingProtocol<String> {
         return result;
     }
     
-    private String proccessConnect(String message) {
+    private String proccessConnect() {
         String errorMsg = "";
         // recognize username header
         String username = searchAndCut(USERNAME_BEGIN_INDEX, "login");
@@ -131,6 +133,9 @@ public class StompProtocol implements StompMessagingProtocol<String> {
 
     private String proccessUnsubscribe() {
         String id = searchAndCut(3, "id");
+        if(id == "-1") {
+            return createErrorFrame("error with unsubscribe", message, "user wasn't subscribed to that channel");
+        }
         connections.unsubscribe(connectionId, id);
         return createReceiptFrame();
     }
