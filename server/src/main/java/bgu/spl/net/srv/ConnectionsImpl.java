@@ -45,6 +45,19 @@ public class ConnectionsImpl<T> implements Connections<T> {
                 topicToId.remove(s);
             }
         }
+
+        for (IdConnectionId s : idToTopic.keySet()){
+            if(s.getConnectionId() == connectionId){
+                idToTopic.remove(s);
+            }
+        }
+
+        for (String s : topicSubs.keySet()){
+            if (topicSubs.get(s).contains(connectionId)){
+                topicSubs.get(s).remove(connectionId);
+            }
+        }
+
         connectedUsers.remove(connectionId);
     }
 

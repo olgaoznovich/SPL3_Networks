@@ -109,7 +109,7 @@ string StompProtocol::processExit(vector<string> vec, User &user)
         user.removeSubId2Game(sId);
         user.removeSubGame2Id(gameName);
     }
-    return "UNSUBSCRIBE\nid:" + std::to_string(sId) + "\receipt:" + std::to_string(rId) + "\n\n";
+    return "UNSUBSCRIBE\nid:" + std::to_string(sId) + "\nreceipt:" + std::to_string(rId) + "\n\n";
 
 } 
 

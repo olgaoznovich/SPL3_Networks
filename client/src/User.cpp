@@ -1,6 +1,6 @@
 #include "../include/User.h"
 
-User::User() : receiptIdCounter(0), username(""), subIdCounter(0), subsId2Game(), reciepts()
+User::User() : receiptIdCounter(0), username(""), subIdCounter(0), subsId2Game(), receipts(), subsGame2Id()
 {
 }
 
@@ -26,17 +26,17 @@ void User::setUserName(std::string newUsername)
 
 void User::addReciept(int receiptId, std::string frameType)
 {
-    reciepts[receiptId] = frameType;
+    receipts[receiptId] = frameType;
 }
 
 std::string User::getReciept(int receiptId)
 {
-    return reciepts[receiptId];
+    return receipts[receiptId];
 }
 
 void User::removeReciept(int receiptId)
 {
-    reciepts.erase(receiptId);
+    receipts.erase(receiptId);
 }
 
 void User::addSubId2Game(int subId, std::string gameName)
@@ -79,4 +79,7 @@ void User::resetUser()
     username = "";
     subIdCounter = 0;
     //add reset to the dicts
+    subsGame2Id.clear();
+    subsId2Game.clear();
+    receipts.clear();
 }

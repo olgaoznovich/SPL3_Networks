@@ -91,6 +91,10 @@ public class StompProtocol implements StompMessagingProtocol<String> {
 
         disconnect();
 
+        if(!recStr.equals("")) {
+            recStr = "\nreceipt:" + recStr;
+        }
+
         return "ERROR" + recStr + "\nmessage:" + message +
             "\n\nThe message:\n-----\n" + theMessage +
             "\n-----\n" + errExp + "\n";
@@ -133,7 +137,7 @@ public class StompProtocol implements StompMessagingProtocol<String> {
 
     private String proccessUnsubscribe() {
         String id = searchAndCut(3, "id");
-        if(id == "-1") {
+        if(id.equals("-1")) {
             return createErrorFrame("error with unsubscribe", message, "user wasn't subscribed to that channel");
         }
         connections.unsubscribe(connectionId, id);

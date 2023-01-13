@@ -8,7 +8,7 @@ class User
         int receiptIdCounter;
         int subIdCounter;
         std::string username;
-        boost::unordered_map<int,std::string> reciepts;
+        boost::unordered_map<int,std::string> receipts;
         boost::unordered_map<int,std::string> subsId2Game;
         boost::unordered_map<std::string, int> subsGame2Id;
 
