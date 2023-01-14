@@ -39,11 +39,15 @@ int main(int argc, char *argv[]) {
         }
 
 		if(connectionHandler.getIsInit()) {
-			std::string frame = protocol.createFrame(line, user);
+			std::queue<std::string> frames = protocol.createFrame(line, user);
 			//execute sendLine only!! if the command is correct and frame was built
 			//for example if there was an error on client side, createframe will return "" and sendLIne wont be executed
-			if (!connectionHandler.sendLine(frame)) {
-				std::cout << "Disconnected. Exiting...\n" << std::endl;
+			while(!frames.empty()) {
+				std::string frame = frames.front();
+				frames.pop();
+				if (!connectionHandler.sendLine(frame)) {
+					std::cout << "Disconnected. Exiting...\n" << std::endl;
+				}
 			}
 			// connectionHandler.sendLine(line) appends '\n' to the message. Therefor we send len+1 bytes.
 		}

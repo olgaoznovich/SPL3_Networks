@@ -1,35 +1,38 @@
 #include "../include/StompProtocol.h"
+#include "../include/event.h"
+#include <queue>
+
 using namespace std;
 
 StompProtocol::StompProtocol() {}
 
-std::string StompProtocol::createFrame(std::string command, User &user) 
+std::queue<std::string> &StompProtocol::createFrame(std::string command, User &user) 
 {
     //we assume the command input is legal
     vector<string> strComps = split(command, ' ');
     string keyword = strComps.at(0);
-    string output = "";
+    queue<string> outputQ;
     if(keyword == "login") 
     {
-        output = processLogin(strComps, user);
+        outputQ.push(processLogin(strComps, user));
     } else if (keyword == "join")
     {
-        output = processJoin(strComps, user);
+        outputQ.push(processJoin(strComps, user));
     } else if (keyword == "exit")
     {
-        output = processExit(strComps, user);
+        outputQ.push(processExit(strComps, user));
     } else if (keyword == "report")
     {
-
+        outputQ = processReport(strComps, user);
     } else if (keyword == "summary")
     {
 
     } else if (keyword == "logout")
     {
-        output = processLogout(strComps, user);
+        outputQ.push(processLogout(strComps, user));
     } 
 
-    return output;
+    return outputQ;
 }
 
 std::string StompProtocol::parseFrame(std::string frame, User &user)
@@ -113,10 +116,34 @@ string StompProtocol::processExit(vector<string> vec, User &user)
 
 } 
 
-string StompProtocol::processReport(vector<string> vec)
+queue<string> &StompProtocol::processReport(vector<string> vec, User &user)
 {
-    return "";
+    names_and_events nne = parseEventsFile(vec.at(vec.size() - 1));
+    queue<string> output;
+    for(Event e : nne.events)
+    {
+        //change time to minutes
+        string frame = "SEND\ndestination:/" + e.get_name() + "\n\nuser" + user.getUserName() + "\nteam a: " + e.get_team_a_name() + "\nteam b: " + e.get_team_b_name() + "\ntime: " + std::to_string(e.get_time()) + "\ngeneral game updates:\n" + printfMap(e.get_game_updates()) + "\nteam a updates:\n" + printfMap(e.get_team_a_updates()) + "\nteam b updates:\n" + printfMap(e.get_team_b_updates()) + "\ndescription:\n" + e.get_discription() + "\n" ;
+        output.push(frame);
+    }
+
+    return output;
 } 
+
+std::string StompProtocol::printfMap(const std::map<std::string, std::string> &map)
+{
+    string output = "";
+    for(pair<string, string> key : map)
+    {
+        output += '\t' + key.first + ": " + key.second + "\n";
+    }
+    if(output.size() > 0) 
+    {
+        output.resize(output.size() - 1);
+    }
+    return output;
+}
+
 
 string StompProtocol::processSummary(vector<string> vec)
 {
