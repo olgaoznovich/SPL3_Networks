@@ -46,7 +46,7 @@ public class BlockingConnectionHandler<T> implements Runnable, ConnectionHandler
         } catch (IOException ex) {
             ex.printStackTrace();
         }
-
+        System.out.println("-----------SOCKET CLOSED IN RUN");
     }
 
     @Override
@@ -58,12 +58,14 @@ public class BlockingConnectionHandler<T> implements Runnable, ConnectionHandler
     @Override
     public void send(T msg) {
         //IMPLEMENT IF NEEDED
-        try (Socket sock = this.sock) {
-            out = new BufferedOutputStream(sock.getOutputStream());
+        try {
+            // out = new BufferedOutputStream(sock.getOutputStream());
+            System.out.println("ConHandler.Send: " + msg);
             out.write(encdec.encode(msg));
             out.flush();
         } catch (IOException ex) {
             ex.printStackTrace();
         }
+        // System.out.println("-------------SOCKET CLOSED IN SEND");
     }
 }

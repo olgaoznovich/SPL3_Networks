@@ -47,6 +47,8 @@ std::string StompProtocol::parseFrame(std::string frame, User &user)
         output = user.getReciept(rId);
     } else if (keyword == "ERROR") {
         output = strComps.at(strComps.size() - 2); //todo: handle the rest!
+    } else if (keyword == "MESSAGE") {
+        output = frame;
     }
     return output;
 }

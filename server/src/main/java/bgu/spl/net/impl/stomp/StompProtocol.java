@@ -144,7 +144,7 @@ public class StompProtocol implements StompMessagingProtocol<String> {
             System.out.println(sub + ": " + output);
             connections.send(sub, output);
         }
-        return "";
+        return null;
     }
 
     private String proccessSubscribe() {
