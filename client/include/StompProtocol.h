@@ -2,6 +2,8 @@
 
 #include "../include/ConnectionHandler.h"
 #include "../include/User.h"
+#include "../include/GameTracker.h"
+
 #include <string>
 #include <vector>
 #include <queue>
@@ -17,15 +19,15 @@ private:
     std::string processJoin(std::vector<std::string> vec, User &user);
     std::string processExit(std::vector<std::string> vec, User &user);
     std::queue<std::string> processReport(std::vector<std::string> vec, User &user);
-    std::string processSummary(std::vector<std::string> vec);
+    void processSummary(std::vector<std::string> vec, GameTracker &gameTracker);
     std::string processLogout(std::vector<std::string> vec, User &user);
     std::string printfMap(const std::map<std::string, std::string> &map);
 
 
 public:
     StompProtocol();
-    std::queue<std::string> createFrame(std::string command, User &user);
-    std::string parseFrame(std::string frame, User &user);
+    std::queue<std::string> createFrame(std::string command, User &user, GameTracker &gameTracker);
+    std::string parseFrame(std::string frame, User &user, GameTracker &gameTracker);
     bool getShouldTerminate();
     void setShouldTerminate(bool value);
     std::vector<std::string> isLoginCommand(std::string command);

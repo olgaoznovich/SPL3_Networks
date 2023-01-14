@@ -6,7 +6,7 @@ using namespace std;
 
 StompProtocol::StompProtocol() {}
 
-std::queue<std::string> StompProtocol::createFrame(std::string command, User &user) 
+std::queue<std::string> StompProtocol::createFrame(std::string command, User &user, GameTracker &gameTracker) 
 {
     //we assume the command input is legal
     vector<string> strComps = split(command, ' ');
@@ -26,7 +26,7 @@ std::queue<std::string> StompProtocol::createFrame(std::string command, User &us
         outputQ = processReport(strComps, user);
     } else if (keyword == "summary")
     {
-
+        processSummary(strComps, gameTracker);
     } else if (keyword == "logout")
     {
         outputQ.push(processLogout(strComps, user));
@@ -35,7 +35,7 @@ std::queue<std::string> StompProtocol::createFrame(std::string command, User &us
     return outputQ;
 }
 
-std::string StompProtocol::parseFrame(std::string frame, User &user)
+std::string StompProtocol::parseFrame(std::string frame, User &user, GameTracker &gameTracker)
 {
     vector<string> strComps = split(frame, '\n');
     string keyword = strComps.at(0);
@@ -149,9 +149,11 @@ std::string StompProtocol::printfMap(const std::map<std::string, std::string> &m
 }
 
 
-string StompProtocol::processSummary(vector<string> vec)
+void StompProtocol::processSummary(vector<string> vec, GameTracker &gameTracker)
 {
-    return "";
+    //string summery = gametracker.createSummary(game, username)
+    //write summery to given filename
+
 } 
 
 string StompProtocol::processLogout(vector<string> vec, User &user)

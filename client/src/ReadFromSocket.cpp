@@ -1,6 +1,6 @@
 #include "../include/ReadFromSocket.h"
 
-ReadFromSocket::ReadFromSocket(ConnectionHandler &conHandler, StompProtocol &protocol, User &user) : conHandler(conHandler), protocol(protocol), shouldTerminate(false), user(user) 
+ReadFromSocket::ReadFromSocket(ConnectionHandler &conHandler, StompProtocol &protocol, User &user, GameTracker &gameTracker) : conHandler(conHandler), protocol(protocol), shouldTerminate(false), user(user), gameTracker(gameTracker)
 {
 
 }
@@ -19,7 +19,7 @@ void ReadFromSocket::Run()
                 break;
             }
             //parse answer and return the reply according to it
-            std::string replyToClient = protocol.parseFrame(answer, user);
+            std::string replyToClient = protocol.parseFrame(answer, user, gameTracker);
 
             if(protocol.isErrorFrame(answer))
             {

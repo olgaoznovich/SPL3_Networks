@@ -3,6 +3,7 @@
 #include "../include/ReadFromSocket.h"
 #include "../include/StompProtocol.h"
 #include "../include/User.h"
+#include "../include/GameTracker.h"
 #include <thread>
 
 
@@ -13,7 +14,8 @@ int main(int argc, char *argv[]) {
 	ConnectionHandler connectionHandler("",0);
 	StompProtocol protocol;
 	User user;
-	ReadFromSocket socket(connectionHandler, protocol, user);
+	GameTracker gameTracker;
+	ReadFromSocket socket(connectionHandler, protocol, user, gameTracker);
 	std::thread socketThread(&ReadFromSocket::Run, &socket);
 	
 
@@ -53,7 +55,7 @@ int main(int argc, char *argv[]) {
         }
 
 		if(connectionHandler.getIsInit()) {
-			std::queue<std::string> frames = protocol.createFrame(line, user);
+			std::queue<std::string> frames = protocol.createFrame(line, user, gameTracker);
 			//execute sendLine only!! if the command is correct and frame was built
 			//for example if there was an error on client side, createframe will return "" and sendLIne wont be executed
 			while(!frames.empty()) {
