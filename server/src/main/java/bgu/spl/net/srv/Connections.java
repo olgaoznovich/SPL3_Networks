@@ -1,6 +1,7 @@
 package bgu.spl.net.srv;
 
 import java.io.IOException;
+import java.util.HashSet;
 
 public interface Connections<T> {
 
@@ -17,4 +18,10 @@ public interface Connections<T> {
     void unsubscribe(int connectionId, String id);
 
     int assignId();
+
+    int assignMsgId();
+
+    HashSet<Integer> getTopicSubs(String topic);
+
+    int getSubId(String topic, int conId);
 }

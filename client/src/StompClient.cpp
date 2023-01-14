@@ -5,12 +5,26 @@
 #include "../include/User.h"
 #include <thread>
 
+
+#include <unistd.h>
+#include <iostream>
+
 int main(int argc, char *argv[]) {
 	ConnectionHandler connectionHandler("",0);
 	StompProtocol protocol;
 	User user;
 	ReadFromSocket socket(connectionHandler, protocol, user);
 	std::thread socketThread(&ReadFromSocket::Run, &socket);
+	
+
+    char cwd[1024];
+    if (getcwd(cwd, sizeof(cwd)) != NULL) {
+        std::cout << "Current working dir: " << cwd << std::endl;
+    } else {
+        std::cout << "getcwd() error" << std::endl;
+    }
+    
+
 
 	//TODO: when disconnect command issued, set isInit to false again!!
 	while(1)

@@ -16,7 +16,7 @@ private:
     std::string processLogin(std::vector<std::string> vec, User &user);
     std::string processJoin(std::vector<std::string> vec, User &user);
     std::string processExit(std::vector<std::string> vec, User &user);
-    std::queue<std::string> &processReport(std::vector<std::string> vec, User &user);
+    std::queue<std::string> processReport(std::vector<std::string> vec, User &user);
     std::string processSummary(std::vector<std::string> vec);
     std::string processLogout(std::vector<std::string> vec, User &user);
     std::string printfMap(const std::map<std::string, std::string> &map);
@@ -24,7 +24,7 @@ private:
 
 public:
     StompProtocol();
-    std::queue<std::string> &createFrame(std::string command, User &user);
+    std::queue<std::string> createFrame(std::string command, User &user);
     std::string parseFrame(std::string frame, User &user);
     bool getShouldTerminate();
     void setShouldTerminate(bool value);

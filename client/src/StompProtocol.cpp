@@ -6,7 +6,7 @@ using namespace std;
 
 StompProtocol::StompProtocol() {}
 
-std::queue<std::string> &StompProtocol::createFrame(std::string command, User &user) 
+std::queue<std::string> StompProtocol::createFrame(std::string command, User &user) 
 {
     //we assume the command input is legal
     vector<string> strComps = split(command, ' ');
@@ -116,14 +116,16 @@ string StompProtocol::processExit(vector<string> vec, User &user)
 
 } 
 
-queue<string> &StompProtocol::processReport(vector<string> vec, User &user)
+queue<string> StompProtocol::processReport(vector<string> vec, User &user)
 {
-    names_and_events nne = parseEventsFile(vec.at(vec.size() - 1));
+    // names_and_events nne = parseEventsFile(vec.at(vec.size() - 1));
+    names_and_events nne = parseEventsFile("/home/spl211/Downloads/SPL3/SPL3_Networks/client/data/events1_partial.json");
+
     queue<string> output;
     for(Event e : nne.events)
     {
         //change time to minutes
-        string frame = "SEND\ndestination:/" + e.get_name() + "\n\nuser" + user.getUserName() + "\nteam a: " + e.get_team_a_name() + "\nteam b: " + e.get_team_b_name() + "\ntime: " + std::to_string(e.get_time()) + "\ngeneral game updates:\n" + printfMap(e.get_game_updates()) + "\nteam a updates:\n" + printfMap(e.get_team_a_updates()) + "\nteam b updates:\n" + printfMap(e.get_team_b_updates()) + "\ndescription:\n" + e.get_discription() + "\n" ;
+        string frame = "SEND\ndestination:/" + e.get_team_a_name() + "_" + e.get_team_b_name() + "\n\nuser: " + user.getUserName() + "\nteam a: " + e.get_team_a_name() + "\nteam b: " + e.get_team_b_name() + "\nevent name: " + e.get_name() + "\ntime: " + std::to_string(e.get_time()) + "\ngeneral game updates:\n" + printfMap(e.get_game_updates()) + "\nteam a updates:\n" + printfMap(e.get_team_a_updates()) + "\nteam b updates:\n" + printfMap(e.get_team_b_updates()) + "\ndescription:\n" + e.get_discription() + "\n" ;
         output.push(frame);
     }
 

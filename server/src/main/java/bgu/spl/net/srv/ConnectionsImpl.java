@@ -12,6 +12,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ConnectionsImpl<T> implements Connections<T> {
 
     private int idCounter;
+    private int msgIdCounter;
     private ConcurrentHashMap<Integer, ConnectionHandler<T>> connectedUsers;
     private ConcurrentHashMap<String, String> registeredUsers;
     private ConcurrentHashMap<String, HashSet<Integer>> topicSubs; //<topic, Set<connectionId>>
@@ -19,6 +20,7 @@ public class ConnectionsImpl<T> implements Connections<T> {
     private ConcurrentHashMap<IdConnectionId, String> idToTopic;
     public ConnectionsImpl() {
         idCounter = 0;
+        msgIdCounter = 0;
         connectedUsers = new ConcurrentHashMap<>();
         registeredUsers = new ConcurrentHashMap<>();
         topicSubs = new ConcurrentHashMap<>();
@@ -38,6 +40,15 @@ public class ConnectionsImpl<T> implements Connections<T> {
             send(sub, msg);
         }
     }
+
+    public HashSet<Integer> getTopicSubs(String topic) {
+        return topicSubs.get(topic);
+    }
+
+    public int getSubId(String topic, int conId) {
+        return topicToId.get(new TopicConnectionId(topic, conId));
+    }
+
 
     public void disconnect(int connectionId) {
         for (TopicConnectionId s : topicToId.keySet()){
@@ -103,4 +114,9 @@ public class ConnectionsImpl<T> implements Connections<T> {
     public int assignId() {
         return idCounter++;
     }
+
+    public int assignMsgId() {
+        return msgIdCounter++;
+    }
+
 }

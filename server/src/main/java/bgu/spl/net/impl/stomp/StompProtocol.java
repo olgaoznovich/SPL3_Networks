@@ -1,5 +1,7 @@
 package bgu.spl.net.impl.stomp;
 
+import java.util.HashSet;
+
 import bgu.spl.net.api.*;
 import bgu.spl.net.srv.ConnectionHandler;
 import bgu.spl.net.srv.Connections;
@@ -119,11 +121,29 @@ public class StompProtocol implements StompMessagingProtocol<String> {
         for (int i = 0; i < msg.length; i++){
             if (msg[i].equals("")){
                 index = i + 1;
+                break;
             }
         }
         String topic = searchAndCut(13, "destination");
-        String message = msg[index];
-        connections.send(topic, message);
+        String reportBody = "";
+        for(int i = index; i < msg.length; i++) {
+            if(i == msg.length - 1) {
+                reportBody += msg[i];
+            } else {
+                reportBody += msg[i] + "\n";
+            }
+        }
+        // connections.send(topic, reportBody);
+        int msgID = connections.assignMsgId();
+        String firstHalfFrame = "MESSAGE\nsubscription:";
+        String secondHalfFrame = "\nmessage-id:" + msgID + "\ndestination:/" + topic + "\n\n" + reportBody + "\n";
+    
+        HashSet<Integer> topicSubs = connections.getTopicSubs(topic);
+        for(int sub : topicSubs) {
+            String output = firstHalfFrame + connections.getSubId(topic, sub) + secondHalfFrame;
+            System.out.println(sub + ": " + output);
+            connections.send(sub, output);
+        }
         return "";
     }
 
