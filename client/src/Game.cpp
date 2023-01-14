@@ -3,6 +3,10 @@
 Game::Game() : generalGameUpdates(), teamAUpdates(), teamBUpdates(), events()
 {}
 
+Game::Game(boost::unordered_map<std::string,std::string> generalStats, boost::unordered_map<std::string,std::string> teamAStats, boost::unordered_map<std::string,std::string> teamBStats) : generalGameUpdates(generalStats), teamAUpdates(teamAStats), teamBUpdates(teamBStats), events()
+{}
+
+
 std::vector<std::string> Game::printfStatMaps() 
 {
     std::vector<std::string> prints;
@@ -36,3 +40,28 @@ std::string Game::printEvents()
     }
     return output;
 }
+
+void Game::addEvent(std::string event)
+{
+    events.push_back(event);
+}
+
+void Game::updateAllStats(boost::unordered_map<std::string,std::string> generalStats, boost::unordered_map<std::string,std::string> teamAStats, boost::unordered_map<std::string,std::string> teamBStats)
+{
+    for(std::pair<std::string, std::string> pair : generalStats)
+    {
+        generalGameUpdates[pair.first] = pair.second;
+    }
+
+    for(std::pair<std::string, std::string> pair : teamAStats)
+    {
+        teamAUpdates[pair.first] = pair.second;
+    }
+
+    for(std::pair<std::string, std::string> pair : teamBStats)
+    {
+        teamBUpdates[pair.first] = pair.second;
+    }
+}
+
+

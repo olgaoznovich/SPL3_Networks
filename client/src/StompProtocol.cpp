@@ -59,11 +59,11 @@ void StompProtocol::proccessMessageFrame(std::string frame, GameTracker &gameTra
 {
     std::vector<std::string> splitVec = split(frame, '\n');
  
-    std::string username = splitVec.at(3).substr(6);
-    std::string teamAname = splitVec.at(4).substr(8);
-    std::string teamBname = splitVec.at(5).substr(8);
-    string eventName = splitVec.at(6).substr(12);
-    string time = splitVec.at(7).substr(6);
+    std::string username = splitVec.at(5).substr(6);
+    std::string teamAname = splitVec.at(6).substr(8);
+    std::string teamBname = splitVec.at(7).substr(8);
+    string eventName = splitVec.at(8).substr(12);
+    string time = splitVec.at(9).substr(6);
     
     std::string gameName = teamAname + "_" + teamBname;
 
@@ -71,12 +71,11 @@ void StompProtocol::proccessMessageFrame(std::string frame, GameTracker &gameTra
     boost::unordered_map<std::string,std::string> teamAstats = extractAttributes("team a updates:", "team b updates:", splitVec);
     boost::unordered_map<std::string,std::string> teamBstats = extractAttributes("team b updates:", "description:", splitVec);
 
-    string desc = splitVec.at(12 + generalStats.size() + teamAstats.size() + teamBstats.size());
+    string desc = splitVec.at(14 + generalStats.size() + teamAstats.size() + teamBstats.size());
 
     string event = time + " - " + eventName + "\n" + desc;
 
-    //add to gametracker
-
+    gameTracker.addUpdate(username, gameName, generalStats, teamAstats, teamBstats, event);
 }
 
 boost::unordered_map<std::string,std::string> StompProtocol::extractAttributes(std::string start, std::string end, std::vector<std::string> strComps)
@@ -91,8 +90,8 @@ boost::unordered_map<std::string,std::string> StompProtocol::extractAttributes(s
 
     int indexEnd = 0;
     for (int i = indexStart; i < strComps.size(); i++){
-        if (strComps.at(i) == start){
-            indexEnd = i + 1;
+        if (strComps.at(i) == end){
+            indexEnd = i;
             break;
         }
     }
@@ -183,7 +182,7 @@ queue<string> StompProtocol::processReport(vector<string> vec, User &user)
     for(Event e : nne.events)
     {
         //change time to minutes
-        string frame = "SEND\ndestination:/" + e.get_team_a_name() + "_" + e.get_team_b_name() + "\n\nuser: " + user.getUserName() + "\nteam a: " + e.get_team_a_name() + "\nteam b: " + e.get_team_b_name() + "\nevent name: " + e.get_name() + "\ntime: " + std::to_string(e.get_time()) + "\ngeneral game updates:\n" + printfMap(e.get_game_updates()) + "\nteam a updates:\n" + printfMap(e.get_team_a_updates()) + "\nteam b updates:\n" + printfMap(e.get_team_b_updates()) + "\ndescription:\n" + e.get_discription() + "\n" ;
+        string frame = "SEND\ndestination:/" + e.get_team_a_name() + "_" + e.get_team_b_name() + "\n\nuser: " + user.getUserName() + "\nteam a: " + e.get_team_a_name() + "\nteam b: " + e.get_team_b_name() + "\nevent name: " + e.get_name() + "\ntime: " + std::to_string(e.get_time()) + "\ngeneral game updates:" + printfMap(e.get_game_updates()) + "\nteam a updates:" + printfMap(e.get_team_a_updates()) + "\nteam b updates:" + printfMap(e.get_team_b_updates()) + "\ndescription:\n" + e.get_discription() + "\n" ;
         output.push(frame);
     }
 
@@ -192,7 +191,7 @@ queue<string> StompProtocol::processReport(vector<string> vec, User &user)
 
 std::string StompProtocol::printfMap(const std::map<std::string, std::string> &map)
 {
-    string output = "";
+    string output = "\n";
     for(pair<string, string> key : map)
     {
         output += '\t' + key.first + ": " + key.second + "\n";
@@ -210,7 +209,8 @@ void StompProtocol::processSummary(vector<string> vec, GameTracker &gameTracker)
     //string summery = gametracker.createSummary(game, username)
     //write summery to given filename
     std::string summary = gameTracker.createSummary(vec.at(1), vec.at(2));
-    std::ofstream file(vec.at(3));
+    // std::ofstream file(vec.at(3));
+    std::ofstream file("/home/spl211/Downloads/SPL3/SPL3_Networks/client/data/summary.txt");
     file << summary;
     file.close();
 } 

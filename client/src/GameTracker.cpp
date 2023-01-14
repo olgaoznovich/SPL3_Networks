@@ -38,10 +38,11 @@ void GameTracker::addUpdate(std::string username, std::string gameName, boost::u
 {
     if((tracker[gameName]).count(username) > 0)
     {
-        //update attributes (the ones that exist), add attributes(the ones that dont)
-        //add event to events
+        (tracker[gameName])[username].updateAllStats(generalStats, teamAStats, teamBStats);
     } else 
     {
-        //create game and sest all the lists to be the fields, add event
+        (tracker[gameName])[username] = Game(generalStats, teamAStats, teamBStats);
     }
+
+    (tracker[gameName])[username].addEvent(event);
 }
