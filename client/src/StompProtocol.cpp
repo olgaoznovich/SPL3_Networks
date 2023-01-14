@@ -1,6 +1,7 @@
 #include "../include/StompProtocol.h"
 #include "../include/event.h"
 #include <queue>
+#include <fstream>
 
 using namespace std;
 
@@ -17,10 +18,10 @@ std::queue<std::string> StompProtocol::createFrame(std::string command, User &us
         outputQ.push(processLogin(strComps, user));
     } else if (keyword == "join")
     {
-        outputQ.push(processJoin(strComps, user));
+        outputQ.push(processJoin(strComps, user, gameTracker));
     } else if (keyword == "exit")
     {
-        outputQ.push(processExit(strComps, user));
+        outputQ.push(processExit(strComps, user, gameTracker));
     } else if (keyword == "report")
     {
         outputQ = processReport(strComps, user);
@@ -48,8 +49,61 @@ std::string StompProtocol::parseFrame(std::string frame, User &user, GameTracker
     } else if (keyword == "ERROR") {
         output = strComps.at(strComps.size() - 2); //todo: handle the rest!
     } else if (keyword == "MESSAGE") {
+        proccessMessageFrame(frame, gameTracker);
         output = frame;
     }
+    return output;
+}
+
+void StompProtocol::proccessMessageFrame(std::string frame, GameTracker &gameTracker)
+{
+    std::vector<std::string> splitVec = split(frame, '\n');
+ 
+    std::string username = splitVec.at(3).substr(6);
+    std::string teamAname = splitVec.at(4).substr(8);
+    std::string teamBname = splitVec.at(5).substr(8);
+    string eventName = splitVec.at(6).substr(12);
+    string time = splitVec.at(7).substr(6);
+    
+    std::string gameName = teamAname + "_" + teamBname;
+
+    boost::unordered_map<std::string,std::string> generalStats = extractAttributes("general game updates:", "team a updates:", splitVec);
+    boost::unordered_map<std::string,std::string> teamAstats = extractAttributes("team a updates:", "team b updates:", splitVec);
+    boost::unordered_map<std::string,std::string> teamBstats = extractAttributes("team b updates:", "description:", splitVec);
+
+    string desc = splitVec.at(12 + generalStats.size() + teamAstats.size() + teamBstats.size());
+
+    string event = time + " - " + eventName + "\n" + desc;
+
+    //add to gametracker
+
+}
+
+boost::unordered_map<std::string,std::string> StompProtocol::extractAttributes(std::string start, std::string end, std::vector<std::string> strComps)
+{
+    int indexStart = 0;
+    for (int i = 0; i < strComps.size(); i++){
+        if (strComps.at(i) == start){
+            indexStart = i + 1;
+            break;
+        }
+    }
+
+    int indexEnd = 0;
+    for (int i = indexStart; i < strComps.size(); i++){
+        if (strComps.at(i) == start){
+            indexEnd = i + 1;
+            break;
+        }
+    }
+
+    boost::unordered_map<std::string,std::string> output;
+
+    for (int i = indexStart; i < indexEnd; i++){
+        vector<string> attAndVal = split(strComps.at(i), ':');
+        output[attAndVal.at(0).substr(1)] = attAndVal.at(1).substr(1);
+    }
+    
     return output;
 }
 
@@ -93,7 +147,7 @@ string StompProtocol::processLogin(vector<string> vec, User &user)
 } 
 
 
-string StompProtocol::processJoin(vector<string> vec, User &user)
+string StompProtocol::processJoin(vector<string> vec, User &user, GameTracker &gameTracker)
 {
     int rId = user.assignRId();
     int sId = user.assignSId();
@@ -101,10 +155,11 @@ string StompProtocol::processJoin(vector<string> vec, User &user)
     user.addReciept(rId, "joined " + gameName);
     user.addSubId2Game(sId, gameName);
     user.addSubGame2Id(gameName, sId);
+    gameTracker.addGametoTracker(gameName);
     return "SUBSCRIBE\ndestination:/" + gameName + "\nid:" + std::to_string(sId) + "\nreceipt:" + std::to_string(rId) + "\n\n";
 } 
 
-string StompProtocol::processExit(vector<string> vec, User &user)
+string StompProtocol::processExit(vector<string> vec, User &user, GameTracker &gameTracker)
 {
     int rId = user.assignRId();
     std::string gameName = vec.at(1);
@@ -113,6 +168,7 @@ string StompProtocol::processExit(vector<string> vec, User &user)
     if(sId >= 0) {
         user.removeSubId2Game(sId);
         user.removeSubGame2Id(gameName);
+        gameTracker.removeGameFromTracker(gameName);
     }
     return "UNSUBSCRIBE\nid:" + std::to_string(sId) + "\nreceipt:" + std::to_string(rId) + "\n\n";
 
@@ -153,7 +209,10 @@ void StompProtocol::processSummary(vector<string> vec, GameTracker &gameTracker)
 {
     //string summery = gametracker.createSummary(game, username)
     //write summery to given filename
-
+    std::string summary = gameTracker.createSummary(vec.at(1), vec.at(2));
+    std::ofstream file(vec.at(3));
+    file << summary;
+    file.close();
 } 
 
 string StompProtocol::processLogout(vector<string> vec, User &user)
