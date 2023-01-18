@@ -1,6 +1,6 @@
 #include "../include/User.h"
 
-User::User() : receiptIdCounter(0), username(""), subIdCounter(0), subsId2Game(), receipts(), subsGame2Id()
+User::User() : receiptIdCounter(0), subIdCounter(0), username(""), receipts(), subsId2Game(), subsGame2Id()
 {
 }
 

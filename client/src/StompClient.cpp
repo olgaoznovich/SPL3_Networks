@@ -25,9 +25,9 @@ int main(int argc, char *argv[]) {
         char buf[bufsize];
         std::cin.getline(buf, bufsize);
 		std::string line(buf);
-		int len=line.length();
 
         std::vector<std::string> hostAndPort = protocol.isLoginCommand(line);
+		
 
         if(hostAndPort.size() > 0 && !connectionHandler.getIsInit())
         {
@@ -41,8 +41,11 @@ int main(int argc, char *argv[]) {
             } else {
 				connectionHandler.setIsInit(true);
 			}               
+			hostAndPort.clear();
         }
-		if(connectionHandler.getIsInit()) {
+		if(hostAndPort.size() > 0) {
+			std::cout << "The client is already logged in ,log out before trying again" << std::endl;
+		} else if(connectionHandler.getIsInit()) {
 			std::queue<std::string> frames = protocol.createFrame(line, user, gameTracker);
 			//execute sendLine only!! if the command is correct and frame was built
 			//for example if there was an error on client side, createframe will return "" and sendLIne wont be executed

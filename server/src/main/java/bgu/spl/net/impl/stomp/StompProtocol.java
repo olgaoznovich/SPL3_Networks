@@ -54,9 +54,9 @@ public class StompProtocol implements StompMessagingProtocol<String> {
             errorMsg += "Password must be filled";
         }
         else {
-            boolean succeed = connections.login(username, password, connectionId, handler);
-            if (!succeed){
-                errorMsg += "Password incorrect";
+            String loginErrorMsg = connections.login(username, password, connectionId, handler);
+            if (loginErrorMsg.length() > 0){
+                errorMsg += loginErrorMsg;
             }
         }
         // next thing add error messages and build answer...

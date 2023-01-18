@@ -11,7 +11,7 @@ public interface Connections<T> {
 
     void disconnect(int connectionId);
 
-    boolean login(String username, String password, int connectionId, ConnectionHandler<T> handler );
+    String login(String username, String password, int connectionId, ConnectionHandler<T> handler );
 
     void subscribe(String topic, int connectionId, String id);
 

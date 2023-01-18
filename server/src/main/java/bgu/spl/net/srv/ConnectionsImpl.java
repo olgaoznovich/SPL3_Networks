@@ -6,6 +6,7 @@ import bgu.spl.net.impl.stomp.TopicConnectionId;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
 
@@ -13,6 +14,7 @@ public class ConnectionsImpl<T> implements Connections<T> {
 
     private int idCounter;
     private int msgIdCounter;
+    private ConcurrentHashMap<String, Integer> usernameToConId;
     private ConcurrentHashMap<Integer, ConnectionHandler<T>> connectedUsers;
     private ConcurrentHashMap<String, String> registeredUsers;
     private ConcurrentHashMap<String, HashSet<Integer>> topicSubs; //<topic, Set<connectionId>>
@@ -26,6 +28,7 @@ public class ConnectionsImpl<T> implements Connections<T> {
         topicSubs = new ConcurrentHashMap<>();
         topicToId = new ConcurrentHashMap<>();
         idToTopic = new ConcurrentHashMap<>();
+        usernameToConId = new ConcurrentHashMap<>();
     }
 
     public boolean send(int connectionId, T msg){ 
@@ -69,19 +72,29 @@ public class ConnectionsImpl<T> implements Connections<T> {
             }
         }
 
+        for (String username : usernameToConId.keySet()){
+            if (usernameToConId.get(username) == connectionId){
+                usernameToConId.remove(username);
+            }
+        }
+
         connectedUsers.remove(connectionId);
     }
 
-    public boolean login(String username, String password, int connectionId, ConnectionHandler<T> handler) {
+    public String login(String username, String password, int connectionId, ConnectionHandler<T> handler) {
         if(registeredUsers.containsKey(username)) {
+            if(usernameToConId.containsKey(username))
+                return "User already logged in";
+            
             if(!password.equals(registeredUsers.get(username))) {
-                return false;
+                return "Wrong password";
             }
         } else {
             registeredUsers.put(username, password);
         }
         connectedUsers.put(connectionId, handler); // todo: return
-        return true;
+        usernameToConId.put(username,connectionId);
+        return "";
     }
 
     @Override

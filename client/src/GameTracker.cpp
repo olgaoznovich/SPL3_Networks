@@ -49,5 +49,5 @@ void GameTracker::addUpdate(std::string username, std::string gameName, boost::u
 
 void GameTracker::resetGameTracker()
 {
-    //todo: implement
+    tracker.clear();
 }

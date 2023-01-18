@@ -5,7 +5,7 @@
 
 using namespace std;
 
-StompProtocol::StompProtocol() {}
+StompProtocol::StompProtocol() : shouldTerminate(false) {}
 
 std::queue<std::string> StompProtocol::createFrame(std::string command, User &user, GameTracker &gameTracker) 
 {
@@ -81,7 +81,7 @@ void StompProtocol::proccessMessageFrame(std::string frame, GameTracker &gameTra
 boost::unordered_map<std::string,std::string> StompProtocol::extractAttributes(std::string start, std::string end, std::vector<std::string> strComps)
 {
     int indexStart = 0;
-    for (int i = 0; i < strComps.size(); i++){
+    for (unsigned int i = 0; i < strComps.size(); i++){
         if (strComps.at(i) == start){
             indexStart = i + 1;
             break;
@@ -89,7 +89,7 @@ boost::unordered_map<std::string,std::string> StompProtocol::extractAttributes(s
     }
 
     int indexEnd = 0;
-    for (int i = indexStart; i < strComps.size(); i++){
+    for (unsigned int i = indexStart; i < strComps.size(); i++){
         if (strComps.at(i) == end){
             indexEnd = i;
             break;

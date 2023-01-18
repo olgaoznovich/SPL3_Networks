@@ -1,6 +1,6 @@
 #include "../include/ReadFromSocket.h"
 
-ReadFromSocket::ReadFromSocket(ConnectionHandler &conHandler, StompProtocol &protocol, User &user, GameTracker &gameTracker) : conHandler(conHandler), protocol(protocol), shouldTerminate(false), user(user), gameTracker(gameTracker)
+ReadFromSocket::ReadFromSocket(ConnectionHandler &conHandler, StompProtocol &protocol, User &user, GameTracker &gameTracker) : conHandler(conHandler), shouldTerminate(false), protocol(protocol), user(user), gameTracker(gameTracker)
 {
 
 }
