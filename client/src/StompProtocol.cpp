@@ -176,7 +176,7 @@ string StompProtocol::processExit(vector<string> vec, User &user, GameTracker &g
 queue<string> StompProtocol::processReport(vector<string> vec, User &user)
 {
     // names_and_events nne = parseEventsFile(vec.at(vec.size() - 1));
-    names_and_events nne = parseEventsFile("../data/" + vec.at(1));
+    names_and_events nne = parseEventsFile("./data/" + vec.at(1));
 
     queue<string> output;
     for(Event e : nne.events)
@@ -210,7 +210,7 @@ void StompProtocol::processSummary(vector<string> vec, GameTracker &gameTracker)
     //write summery to given filename
     std::string summary = gameTracker.createSummary(vec.at(1), vec.at(2));
     // std::ofstream file(vec.at(3));
-    std::ofstream file("../data/" + vec.at(3));
+    std::ofstream file("./data/" + vec.at(3));
     file << summary;
     file.close();
 } 
