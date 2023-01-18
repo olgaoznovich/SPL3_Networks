@@ -46,3 +46,8 @@ void GameTracker::addUpdate(std::string username, std::string gameName, boost::u
 
     (tracker[gameName])[username].addEvent(event);
 }
+
+void GameTracker::resetGameTracker()
+{
+    //todo: implement
+}

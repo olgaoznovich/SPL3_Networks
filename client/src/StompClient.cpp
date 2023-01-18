@@ -18,17 +18,6 @@ int main(int argc, char *argv[]) {
 	ReadFromSocket socket(connectionHandler, protocol, user, gameTracker);
 	std::thread socketThread(&ReadFromSocket::Run, &socket);
 	
-
-    char cwd[1024];
-    if (getcwd(cwd, sizeof(cwd)) != NULL) {
-        std::cout << "Current working dir: " << cwd << std::endl;
-    } else {
-        std::cout << "getcwd() error" << std::endl;
-    }
-    
-
-
-	//TODO: when disconnect command issued, set isInit to false again!!
 	while(1)
     {
         std::cout << "enter command" << std::endl;
@@ -47,13 +36,12 @@ int main(int argc, char *argv[]) {
             connectionHandler.setPort(port);
 			connectionHandler.setHost(host);
             if (!connectionHandler.connect()) {
-                std::cerr << "Cannot connect to " << host << ":" << port << std::endl;
+                std::cerr << "Could not connect to server" << std::endl;
 				
             } else {
 				connectionHandler.setIsInit(true);
 			}               
         }
-
 		if(connectionHandler.getIsInit()) {
 			std::queue<std::string> frames = protocol.createFrame(line, user, gameTracker);
 			//execute sendLine only!! if the command is correct and frame was built
@@ -65,7 +53,6 @@ int main(int argc, char *argv[]) {
 					std::cout << "Disconnected. Exiting...\n" << std::endl;
 				}
 			}
-			// connectionHandler.sendLine(line) appends '\n' to the message. Therefor we send len+1 bytes.
 		}
     }
 	socketThread.join();

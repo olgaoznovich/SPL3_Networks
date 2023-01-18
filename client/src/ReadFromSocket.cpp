@@ -24,8 +24,9 @@ void ReadFromSocket::Run()
             if(protocol.isErrorFrame(answer))
             {
                 user.resetUser();
-                    conHandler.close();
-                    conHandler.setIsInit(false);
+                conHandler.close();
+                conHandler.setIsInit(false);
+                gameTracker.resetGameTracker();
             } else
             {
                 int rId = protocol.getReciptId(answer);
@@ -39,6 +40,7 @@ void ReadFromSocket::Run()
                         user.resetUser();
                         conHandler.close();
                         conHandler.setIsInit(false);
+                        gameTracker.resetGameTracker();
                     } else
                     {
                         user.removeReciept(rId);
