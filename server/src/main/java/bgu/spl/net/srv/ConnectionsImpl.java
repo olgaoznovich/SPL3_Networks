@@ -4,11 +4,13 @@ import bgu.spl.net.impl.stomp.IdConnectionId;
 import bgu.spl.net.impl.stomp.TopicConnectionId;
 
 import java.util.HashSet;
+import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 
 public class ConnectionsImpl<T> implements Connections<T> {
+
 
     private AtomicInteger idCounter;
     private ConcurrentHashMap<Integer, ConnectionHandler<T>> connectedUsers;
@@ -23,6 +25,7 @@ public class ConnectionsImpl<T> implements Connections<T> {
         topicSubs = new ConcurrentHashMap<>();
         topicToId = new ConcurrentHashMap<>();
         idToTopic = new ConcurrentHashMap<>();
+        usernameToConId = new ConcurrentHashMap<>();
     }
 
     public boolean send(int connectionId, T msg){ 
@@ -38,25 +41,57 @@ public class ConnectionsImpl<T> implements Connections<T> {
         }
     }
 
+    public HashSet<Integer> getTopicSubs(String topic) {
+        return topicSubs.get(topic);
+    }
+
+    public int getSubId(String topic, int conId) {
+        return topicToId.get(new TopicConnectionId(topic, conId));
+    }
+
+
     public void disconnect(int connectionId) {
         for (TopicConnectionId s : topicToId.keySet()){
             if (s.getConnectionID() == connectionId){
                 topicToId.remove(s);
             }
         }
+
+        for (IdConnectionId s : idToTopic.keySet()){
+            if(s.getConnectionId() == connectionId){
+                idToTopic.remove(s);
+            }
+        }
+
+        for (String s : topicSubs.keySet()){
+            if (topicSubs.get(s).contains(connectionId)){
+                topicSubs.get(s).remove(connectionId);
+            }
+        }
+
+        for (String username : usernameToConId.keySet()){
+            if (usernameToConId.get(username) == connectionId){
+                usernameToConId.remove(username);
+            }
+        }
+
         connectedUsers.remove(connectionId);
     }
 
-    public boolean login(String username, String password, int connectionId, ConnectionHandler<T> handler) {
+    public String login(String username, String password, int connectionId, ConnectionHandler<T> handler) {
         if(registeredUsers.containsKey(username)) {
+            if(usernameToConId.containsKey(username))
+                return "User already logged in";
+            
             if(!password.equals(registeredUsers.get(username))) {
-                return false;
+                return "Wrong password";
             }
         } else {
             registeredUsers.put(username, password);
         }
         connectedUsers.put(connectionId, handler); // todo: return
-        return true;
+        usernameToConId.put(username,connectionId);
+        return "";
     }
 
     @Override
@@ -89,4 +124,9 @@ public class ConnectionsImpl<T> implements Connections<T> {
     public int assignId() {
         return idCounter.getAndIncrement();
     }
+
+    public int assignMsgId() {
+        return msgIdCounter++;
+    }
+
 }

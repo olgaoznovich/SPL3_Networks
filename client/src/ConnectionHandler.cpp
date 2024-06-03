@@ -8,8 +8,7 @@ using std::cerr;
 using std::endl;
 using std::string;
 
-ConnectionHandler::ConnectionHandler(string host, short port) : host_(host), port_(port), io_service_(),
-                                                                socket_(io_service_) {}
+ConnectionHandler::ConnectionHandler(string host, short port) : host_(host), port_(port), io_service_(), socket_(io_service_), isInit(false) {}
 
 ConnectionHandler::~ConnectionHandler() {
 	close();
@@ -65,11 +64,11 @@ bool ConnectionHandler::sendBytes(const char bytes[], int bytesToWrite) {
 }
 
 bool ConnectionHandler::getLine(std::string &line) {
-	return getFrameAscii(line, '\n');
+	return getFrameAscii(line, '\0');
 }
 
 bool ConnectionHandler::sendLine(std::string &line) {
-	return sendFrameAscii(line, '\n');
+	return sendFrameAscii(line, '\0');
 }
 
 
@@ -96,6 +95,26 @@ bool ConnectionHandler::sendFrameAscii(const std::string &frame, char delimiter)
 	bool result = sendBytes(frame.c_str(), frame.length());
 	if (!result) return false;
 	return sendBytes(&delimiter, 1);
+}
+
+void ConnectionHandler::setHost(std::string host)
+{
+	host_ = host;
+}
+
+void ConnectionHandler::setPort(int port)
+{
+	port_ = port;
+}
+
+void ConnectionHandler::setIsInit(bool newValue)
+{
+	isInit = newValue;
+}
+
+bool ConnectionHandler::getIsInit()
+{
+	return isInit;
 }
 
 // Close down the connection properly.
