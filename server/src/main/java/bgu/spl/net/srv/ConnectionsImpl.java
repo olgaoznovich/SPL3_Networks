@@ -3,22 +3,21 @@ package bgu.spl.net.srv;
 import bgu.spl.net.impl.stomp.IdConnectionId;
 import bgu.spl.net.impl.stomp.TopicConnectionId;
 
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 
 public class ConnectionsImpl<T> implements Connections<T> {
 
-    private int idCounter;
+    private AtomicInteger idCounter;
     private ConcurrentHashMap<Integer, ConnectionHandler<T>> connectedUsers;
     private ConcurrentHashMap<String, String> registeredUsers;
     private ConcurrentHashMap<String, HashSet<Integer>> topicSubs; //<topic, Set<connectionId>>
     private ConcurrentHashMap<TopicConnectionId, Integer> topicToId;
     private ConcurrentHashMap<IdConnectionId, String> idToTopic;
     public ConnectionsImpl() {
-        idCounter = 0;
+        this.idCounter = new AtomicInteger(0);
         connectedUsers = new ConcurrentHashMap<>();
         registeredUsers = new ConcurrentHashMap<>();
         topicSubs = new ConcurrentHashMap<>();
@@ -88,6 +87,6 @@ public class ConnectionsImpl<T> implements Connections<T> {
     }
 
     public int assignId() {
-        return idCounter++;
+        return idCounter.getAndIncrement();
     }
 }

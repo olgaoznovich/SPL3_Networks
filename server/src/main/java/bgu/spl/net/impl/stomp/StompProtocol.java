@@ -7,6 +7,10 @@ import bgu.spl.net.srv.Connections;
 public class StompProtocol implements StompMessagingProtocol<String> {
     private final int USERNAME_BEGIN_INDEX = 6;
     private final int PASSWORD_BEGIN_INDEX = 9;
+    private final int ID_BEGIN_INDEX = 3;
+    private final int DESTINATION_BEGIN_INDEX = 13;
+
+    private final int RECEIPT_BEGIN_INDEX = 8;
     private boolean shouldTerminate = false;
     private int connectionId;
     private Connections<String> connections;
@@ -91,11 +95,8 @@ public class StompProtocol implements StompMessagingProtocol<String> {
     }
 
     private String checkRecipient(){
-        String recStr = searchAndCut(8, "receipt");
-        if (recStr == null){
-            return "";
-        }
-        else return "\nreciept-id:" + recStr;
+        String recStr = searchAndCut(RECEIPT_BEGIN_INDEX, "receipt");
+        return (recStr != null) ? "\nreciept-id:" + recStr : "";
     }
 
 
@@ -111,21 +112,21 @@ public class StompProtocol implements StompMessagingProtocol<String> {
                 index = i + 1;
             }
         }
-        String topic = searchAndCut(13, "destination");
+        String topic = searchAndCut(DESTINATION_BEGIN_INDEX, "destination");
         String message = msg[index];
         connections.send(topic, message);
         return "";
     }
 
     private String proccessSubscribe() {
-        String topic = searchAndCut(13, "destination");
-        String id = searchAndCut(3, "id");
+        String topic = searchAndCut(DESTINATION_BEGIN_INDEX, "destination");
+        String id = searchAndCut(ID_BEGIN_INDEX, "id");
         connections.subscribe(topic, connectionId, id);
         return "";
     }
 
     private String proccessUnsubscribe() {
-        String id = searchAndCut(3, "id");
+        String id = searchAndCut(ID_BEGIN_INDEX, "id");
         connections.unsubscribe(connectionId, id);
         return "";
     }
