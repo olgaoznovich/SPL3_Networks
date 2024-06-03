@@ -8,9 +8,10 @@ import bgu.spl.net.srv.ServerFactory;
 public class StompServer {
 
     public static void main(String[] args) {
-        int port = Integer.parseInt(args[0]);
-        String serverType = args[1];
-        boolean isReactor = args[1].equals("reactor");
+        // int port = Integer.parseInt(args[0]);
+        int port = 1507;
+        String serverType = "tcp";
+        boolean isReactor = serverType.equals("reactor");
         int numberOfThreads = 3;
         ServerFactory<String> stringServerFactory = new ServerFactory<>(numberOfThreads,
                 port,
