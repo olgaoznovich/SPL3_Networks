@@ -1,3 +1,4 @@
+
 #include "../include/StompProtocol.h"
 #include "../include/event.h"
 #include <queue>
@@ -252,3 +253,4 @@ bool StompProtocol::isErrorFrame(std::string frame)
     vector<string> strComps = split(frame, '\n');
     return strComps.at(0) == "ERROR";
 }
+
